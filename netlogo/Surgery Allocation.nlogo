@@ -1,13 +1,109 @@
+globals
+[
+  hospitals
+  operating_rooms
+  surgeons
+  surgeries
 
+  total-waiting-time
+  total-surgeries
+  max-waiting-time
+]
+
+turtles-own [
+  surgery-id
+  duration
+  urgency
+  surgery-type
+  specialty
+  assigned-or
+  assigned-surgeon
+  assigned-day
+  start-time
+  prep-time
+]
+
+patches-own [
+  patch-type
+  patch-id
+  hospital
+  hospital-type
+
+  ;; operating rooms variables
+  or-schedule
+  or-type
+
+  ;; surgeon variables
+  surgeon-name
+  surgeon-specialty
+]
+
+to setup
+  clear-all
+  mock-create-surgeries
+end
+
+to mock-create-surgeries
+  let id 1
+  loop [
+    create-turtles 1 [
+      set surgery-id id
+      set size 2
+      set color yellow
+      set urgency ((random 3) + 1)
+      ifelse urgency = 1
+      [set color green]
+      [
+        ifelse urgency = 2
+        [set color yellow]
+        [set color red]
+      ]
+      let aux-type (random 3)
+      ifelse aux-type = 0
+      [
+        set surgery-type "big"
+        set specialty "vascular"
+      ]
+      [
+        set surgery-type "small"
+        set specialty "orthopedy"
+      ]
+    ]
+    ifelse id >= 10
+    [stop]
+    [set id (id + 1)]
+  ]
+end
+
+;; calculate a surgery's preparation time
+to calculate-prep-time
+  ifelse surgery-type = "big"
+  [set prep-time ((random 20) + 40)] ;; between 40 and 60 minutes of preparation
+  [
+    ifelse surgery-type = "medium"
+    [set prep-time ((random 10) + 30)] ;; between 30 and 40 minutes of preparation
+    [set prep-time ((random 20) + 10)] ;; between 10 and 30 minutes of preparation
+  ]
+end
+
+;; order surgeries by urgency
+to order-surgeries
+  set surgeries (sort-on [(- urgency)] turtles)
+  show surgeries
+end
+
+to go
+  order-surgeries
+end
 @#$#@#$#@
 GRAPHICS-WINDOW
-210
+468
 10
-647
-448
+730
+273
 -1
 -1
-13.0
+7.7
 1
 10
 1
@@ -26,6 +122,50 @@ GRAPHICS-WINDOW
 1
 ticks
 30.0
+
+BUTTON
+126
+213
+189
+246
+NIL
+go
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+CHOOSER
+10
+14
+189
+59
+operating_policy
+operating_policy
+"type1" "type2"
+0
+
+BUTTON
+50
+244
+113
+277
+NIL
+setup
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
 
 @#$#@#$#@
 ## WHAT IS IT?
