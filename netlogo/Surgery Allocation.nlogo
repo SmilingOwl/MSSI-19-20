@@ -1,6 +1,7 @@
 extensions [csv]
 globals
 [
+  ;id,urgency,surgery-type,surgery-specialty
   surgeries-data
   ordered-surgeries
   total-waiting-time
