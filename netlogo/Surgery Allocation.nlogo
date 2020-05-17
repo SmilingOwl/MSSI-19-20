@@ -20,7 +20,7 @@ surgeries-own [
   urgency
   surgery-type
   surgery-specialty
-  assigned-or
+  assigned-op-room
   assigned-surgeon
   assigned-day
   start-time
