@@ -46,8 +46,8 @@ surgeons-own [
 
 to setup
   clear-all
-  set surgeries-data csv:from-file "data/surgeries.csv"
-  print surgeries-data
+  set surgeries-data csv:from-file "surgeries.csv"
+
   mock-create-surgeries
 end
 
