@@ -1,21 +1,25 @@
 globals
 [
-  hospitals
-  operating_rooms
-  surgeons
-  surgeries
-
+  ordered-surgeries
   total-waiting-time
   total-surgeries
   max-waiting-time
+  total-prep-time
+  max-prep-time
 ]
 
-turtles-own [
+; agents
+breed [hospitals hospital]
+breed [operating-rooms operating-room]
+breed [surgeons surgeon]
+breed [surgeries surgery]
+
+surgeries-own [
   surgery-id
   duration
   urgency
   surgery-type
-  specialty
+  surgery-specialty
   assigned-or
   assigned-surgeon
   assigned-day
@@ -23,18 +27,18 @@ turtles-own [
   prep-time
 ]
 
-patches-own [
-  patch-type
-  patch-id
-  hospital
+hospitals-own [
+  hospital-id
   hospital-type
+]
 
-  ;; operating rooms variables
+operating-rooms-own [
   or-schedule
   or-type
+]
 
-  ;; surgeon variables
-  surgeon-name
+surgeons-own [
+  surgeon-id
   surgeon-specialty
 ]
 
@@ -43,13 +47,24 @@ to setup
   mock-create-surgeries
 end
 
+; order surgeries by urgency
+to order-surgeries
+  set ordered-surgeries sort-on [(- urgency)] surgeries
+  show ordered-surgeries
+end
+
+to go
+  order-surgeries
+
+end
+
+; mock function to be deleted
 to mock-create-surgeries
   let id 1
   loop [
-    create-turtles 1 [
+    create-surgeries 1 [
       set surgery-id id
       set size 2
-      set color yellow
       set urgency ((random 3) + 1)
       ifelse urgency = 1
       [set color green]
@@ -62,38 +77,17 @@ to mock-create-surgeries
       ifelse aux-type = 0
       [
         set surgery-type "big"
-        set specialty "vascular"
+        set surgery-specialty "vascular"
       ]
       [
         set surgery-type "small"
-        set specialty "orthopedy"
+        set surgery-specialty "orthopedy"
       ]
     ]
     ifelse id >= 10
     [stop]
     [set id (id + 1)]
   ]
-end
-
-;; calculate a surgery's preparation time
-to calculate-prep-time
-  ifelse surgery-type = "big"
-  [set prep-time ((random 20) + 40)] ;; between 40 and 60 minutes of preparation
-  [
-    ifelse surgery-type = "medium"
-    [set prep-time ((random 10) + 30)] ;; between 30 and 40 minutes of preparation
-    [set prep-time ((random 20) + 10)] ;; between 10 and 30 minutes of preparation
-  ]
-end
-
-;; order surgeries by urgency
-to order-surgeries
-  set surgeries (sort-on [(- urgency)] turtles)
-  show surgeries
-end
-
-to go
-  order-surgeries
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
