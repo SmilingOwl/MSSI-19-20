@@ -1,8 +1,6 @@
 extensions [csv]
 globals
 [
-  ;id,urgency,surgery-type,surgery-specialty
-  surgeries-data
   ordered-surgeries
   total-waiting-time
   total-surgeries
@@ -33,6 +31,7 @@ surgeries-own [
 hospitals-own [
   hospital-id
   hospital-type
+  hospital-number-or
 ]
 
 operating-rooms-own [
@@ -47,9 +46,9 @@ surgeons-own [
 
 to setup
   clear-all
-  set surgeries-data csv:from-file "data/surgeries.csv"
-  print surgeries-data
-  mock-create-surgeries
+  create-surgeries-data
+  create-hospitals-data
+  create-surgeons-data
 end
 
 ; order surgeries by urgency
@@ -60,7 +59,6 @@ end
 
 to go
   order-surgeries
-
 end
 
 ; mock function to be deleted
@@ -94,12 +92,61 @@ to mock-create-surgeries
     [set id (id + 1)]
   ]
 end
+
+ ;id,urgency,surgery-type,surgery-specialty
+to create-surgeries-data
+file-open "data/surgeries.csv"
+  while [ not file-at-end? ] [
+   let data csv:from-row file-read-line
+   create-surgeries 1 [
+     set size 1
+     set color blue
+     setxy random-pxcor random-pycor
+     set surgery-id item 0 data
+     set urgency item 1 data
+     set surgery-type item 2 data
+     set surgery-specialty item 3 data
+         ]
+ ]
+end
+
+ ;id,type,or number
+to create-hospitals-data
+file-open "data/hospitals.csv"
+  while [ not file-at-end? ] [
+   let data csv:from-row file-read-line
+   create-hospitals 1 [
+     set size 2
+     set color 15
+     setxy random-pxcor random-pycor
+     set hospital-id item 0 data
+     set hospital-type item 1 data
+     set hospital-number-or item 2 data
+        ]
+     ;; TODO - falta criar as or
+ ]
+end
+
+; id,specialty
+to create-surgeons-data
+file-open "data/surgeons.csv"
+  while [ not file-at-end? ] [
+   let data csv:from-row file-read-line
+   create-surgeons 1 [
+     set size 1
+     set color 5
+     setxy random-pxcor random-pycor
+     set surgeon-id item 0 data
+     set surgeon-specialty item 1 data
+         ]
+ ]
+end
 @#$#@#$#@
 GRAPHICS-WINDOW
 468
 10
-730
-273
+791
+334
 -1
 -1
 7.7
@@ -112,10 +159,10 @@ GRAPHICS-WINDOW
 1
 1
 1
--16
-16
--16
-16
+-20
+20
+-20
+20
 0
 0
 1
@@ -123,10 +170,10 @@ ticks
 30.0
 
 BUTTON
-126
-213
-189
-246
+109
+106
+172
+139
 NIL
 go
 NIL
@@ -150,10 +197,10 @@ operating_policy
 0
 
 BUTTON
-50
-244
-113
-277
+38
+106
+101
+139
 NIL
 setup
 NIL
