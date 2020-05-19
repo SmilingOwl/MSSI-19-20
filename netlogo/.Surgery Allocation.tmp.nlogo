@@ -69,12 +69,12 @@ to go
   foreach ordered-surgeries
   [
     first-surgery -> ask first-surgery [do-something]
-    tick
   ]
 end
 
 to do-something
   show (urgency)
+  tick
 end
 
 ; mock function to be deleted
