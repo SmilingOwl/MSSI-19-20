@@ -1,7 +1,6 @@
 extensions [csv]
 globals
 [
-  operating-policy
   ordered-surgeries
   total-waiting-time
   total-surgeries
@@ -32,8 +31,6 @@ surgeries-own [
 hospitals-own [
   hospital-id
   hospital-type
-  hospital-number-or
-  list-or
 ]
 
 patches-own [
@@ -46,12 +43,16 @@ surgeons-own [
   surgeon-id
   surgeon-specialty
   surgeon-hosp-id
-  surgeon-expertise
 ]
 
 to setup
   clear-all
   reset-ticks
+  set total-waiting-time 0
+  set total-surgeries 0
+  set max-waiting-time 0
+  set total-prep-time 0
+  set max-prep-time 0
   create-surgeries-data
   show count surgeries
   create-hospitals-data
@@ -59,7 +60,7 @@ to setup
   order-surgeries
 end
 
-; order surgeries by urgency
+;; order surgeries by urgency
 to order-surgeries
   set ordered-surgeries sort-on [(- urgency)] surgeries
   show ordered-surgeries
@@ -68,59 +69,70 @@ end
 to go
   foreach ordered-surgeries
   [
-    first-surgery -> ask first-surgery [do-something]
+    first-surgery -> ask first-surgery [ask-available-schedules]
+    tick
   ]
 end
 
-to do-something
-  show (urgency)
-  tick
+to ask-available-schedules
+  let surgery-hosp-id hosp-id
+  let schedule []
+  let s-type surgery-type
+  let ors-list patches with [or-hosp-id != 0]
+  ifelse heuristic = "minimize-prep-time"
+  [ set ors-list patches with [or-hosp-id = surgery-hosp-id and or-type = s-type] ]
+  [ set ors-list patches with [or-hosp-id = surgery-hosp-id] ]
+  ask ors-list
+  [
+    set schedule insert-item (length schedule) schedule pycor
+  ]
+  show schedule
 end
 
-; mock function to be deleted
-to mock-create-surgeries
-  let id 1
-  loop [
-    create-surgeries 1 [
-      set surgery-id id
-      set size 2
-      set urgency ((random 3) + 1)
-      ifelse urgency = 1
-      [set color green]
-      [
-        ifelse urgency = 2
-        [set color yellow]
-        [set color red]
-      ]
-      let aux-type (random 3)
-      ifelse aux-type = 0
-      [
-        set surgery-type "big"
-        set surgery-specialty "vascular"
-      ]
-      [
-        set surgery-type "small"
-        set surgery-specialty "orthopedy"
-      ]
-    ]
-    ifelse id >= 10
-    [stop]
-    [set id (id + 1)]
+to-report choose-best-schedule [s-type]
+  ;;TODO
+end
+
+to-report calculate-duration
+  ifelse surgery-type = "big"
+  [ report 90 ]
+  [ ifelse surgery-type = "medium"
+    [ report 60 ]
+    [ report 30 ]
   ]
+end
+
+to-report calculate-schedule [specialty s-duration s-type]
+  ;; TODO
+end
+
+to-report calculate-prep-time [s-type day]
+  let s-prep-time 0
+  ifelse s-type = "big"
+  [set s-prep-time 30] ;; 30 minutes for equipment
+  [
+    ifelse s-type = "medium"
+    [set s-prep-time 20] ;; 20 minutes for equipment
+    [set s-prep-time 10] ;; 10 minutes for equipment
+  ]
+  ;; TODO - check if there was a surgery before with the same type
+  set s-prep-time (s-prep-time + 10) ;; 10 minutes for other activities
+  report s-prep-time
 end
 
 ;; id,urgency,surgery-type,surgery-specialty
 to create-surgeries-data
-  file-open "data/surgeries.csv"
+  file-open (word data-folder "/surgeries.csv")
   while [ not file-at-end? ] [
     let data csv:from-row file-read-line
     create-surgeries 1 [
       set size 1
-      setxy random-pxcor random-pycor
+      setxy -15 15
       set surgery-id item 0 data
       set urgency item 1 data
       set surgery-type item 2 data
       set surgery-specialty item 3 data
+      set hosp-id item 4 data
       ifelse urgency = 1
       [set color green]
       [
@@ -133,48 +145,75 @@ to create-surgeries-data
   file-close
 end
 
-;; id,type,or number
+;; id,type,small or number,medium or number,big or number
 to create-hospitals-data
-file-open "data/hospitals.csv"
+  file-open (word data-folder "/hospitals.csv")
+  let or-big 0
+  let or-medium 0
+  let or-small 0
+  let last-or 0
+  random-seed
   while [ not file-at-end? ] [
-   let data csv:from-row file-read-line
-   create-hospitals 1 [
-     set size 2
-     set color 15
-     setxy random-pxcor random-pycor
-     set hospital-id item 0 data
-     set hospital-type item 1 data
-     set hospital-number-or item 2 data
+    let data csv:from-row file-read-line
+    let hospital-color (random 140)
+    create-hospitals 1 [
+      set size 2
+      set color black
+      setxy 20 20
+      set hospital-id item 0 data
+      set hospital-type item 1 data
+      set or-big item 2 data
+      set or-medium item 3 data
+      set or-small item 4 data
+    ]
+    let i 0
+    while [i < or-medium + or-small + or-big]
+    [
+      let y (40 - ((last-or * 4 + 2) mod 40) - 20)
+      let x (38 - (floor ((last-or * 4 + 2) / 40)) * 4 - 20)
+      ask patches with [pxcor = x and pycor = y] [
+        set pcolor hospital-color
+        set or-hosp-id item 0 data
+        set or-schedule []
+        ifelse i < or-small
+        [ set or-type "small" ]
+        [ ifelse i < or-small + or-medium
+          [set or-type "medium"]
+          [set or-type "big"]
         ]
-     ;; TODO - falta criar as or
- ]
+      ]
+      set i (i + 1)
+      set last-or (last-or + 1)
+    ]
+  ]
   file-close
 end
 
-;; id,specialty
+;; id,specialty,hospital
 to create-surgeons-data
-file-open "data/surgeons.csv"
+  file-open (word data-folder "/surgeons.csv")
   while [ not file-at-end? ] [
-   let data csv:from-row file-read-line
-   create-surgeons 1 [
-     set size 1
-     set color 5
-     setxy random-pxcor random-pycor
-     set surgeon-id item 0 data
-     set surgeon-specialty item 1 data
-         ]
- ]
+    let data csv:from-row file-read-line
+    create-surgeons 1 [
+      set size 1
+      set color 5
+      setxy -15 -15
+      set surgeon-id item 0 data
+      set surgeon-specialty item 1 data
+      set surgeon-hosp-id item 2 data
+    ]
+  ]
   file-close
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-468
+379
 10
 791
-334
+423
 -1
 -1
-7.7
+9.854
 1
 10
 1
@@ -195,10 +234,10 @@ ticks
 30.0
 
 BUTTON
-109
-106
-172
-139
+280
+15
+343
+48
 NIL
 go
 NIL
@@ -216,16 +255,16 @@ CHOOSER
 14
 189
 59
-operating_policy
-operating_policy
-"type1" "type2"
-0
+heuristic
+heuristic
+"minimize-prep-time" "minimize-waiting-time" "across-hospitals"
+2
 
 BUTTON
-38
-106
-101
-139
+209
+15
+272
+48
 NIL
 setup
 NIL
@@ -237,6 +276,17 @@ NIL
 NIL
 NIL
 1
+
+INPUTBOX
+10
+77
+188
+137
+data-folder
+data/simple_example
+1
+0
+String
 
 @#$#@#$#@
 ## WHAT IS IT?
