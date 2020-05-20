@@ -16,7 +16,7 @@ breed [surgeries surgery]
 
 surgeries-own [
   surgery-id
-  duration
+  duration ;; list with each element being [hospital-id]
   urgency
   surgery-type
   surgery-specialty
@@ -43,7 +43,11 @@ surgeons-own [
   surgeon-id
   surgeon-specialty
   surgeon-hosp-id
+  surgeon-expertise
 ]
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; INTERFACE FUNCTIONS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 to setup
   clear-all
@@ -60,53 +64,109 @@ to setup
   order-surgeries
 end
 
-;; order surgeries by urgency
+to go
+  show (get-day-free-time (list 1 2) 10 30 1)
+
+  ;ask (item 0 ordered-surgeries)
+  ;[
+  ;  allocate-operating-block
+  ;]
+  ;foreach ordered-surgeries
+  ;[
+  ;  first-surgery -> ask first-surgery [allocate-operating-block]
+  ;  tick
+  ;]
+end
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; GLOBAL FUNCTIONS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; order surgeries by urgency TESTED
 to order-surgeries
   set ordered-surgeries sort-on [(- urgency)] surgeries
-  show ordered-surgeries
 end
 
-to go
-  foreach ordered-surgeries
+;; obtain best surgeon that would do the surgery in each hospital. heuristic -> most free time TESTED
+to-report get-surgeon-per-hospital [specialty]
+  let hospitals-surgeon []
+  ask hospitals
   [
-    first-surgery -> ask first-surgery [ask-available-schedules]
-    tick
+    set hospitals-surgeon (insert-item (length hospitals-surgeon) hospitals-surgeon (get-surgeon hospital-id specialty))
   ]
+  report hospitals-surgeon
 end
 
-to ask-available-schedules
-  let surgery-hosp-id hosp-id
-  let schedule []
-  let s-type surgery-type
-  let ors-list patches with [or-hosp-id != 0]
-  ifelse heuristic = "minimize-prep-time"
-  [ set ors-list patches with [or-hosp-id = surgery-hosp-id and or-type = s-type] ]
-  [ set ors-list patches with [or-hosp-id = surgery-hosp-id] ]
+;; calculate surgery's duration taking into account its type and the level of expertise of the surgeon, received as argument
+to-report calculate-duration [s-type expertise]
+  let s-duration 0
+  ifelse s-type = "big"
+  [ set s-duration 120 ]
+  [ ifelse s-type = "medium"
+    [ set s-duration 90 ]
+    [ set s-duration 45 ]
+  ]
+
+  ifelse expertise = "new"
+  [set s-duration (s-duration + 30)]
+  [
+    if expertise = "expert"
+    [set s-duration (s-duration - 20)]
+  ]
+  report s-duration
+end
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; SURGERY FUNCTIONS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+to allocate-operating-block
+  ;; get surgeon who would perform the surgery in each hospital
+  let surgeon-hospital (get-surgeon-per-hospital surgery-specialty) ;[hospital-id surgeon-id surgeon-expertise]
+  show surgeon-hospital
+
+  ;; obtain duration of the surgery with each surgeon
+  foreach surgeon-hospital
+  [
+    a-surgeon -> set duration (insert-item (length duration) duration (list (item 0 a-surgeon)  (calculate-duration surgery-type (item 2 a-surgeon))))
+  ]
+
+  ;; get operating rooms schedule
+
+  let ors-list patches with [or-hosp-id != 0] ;; obtain all operating rooms
+  let schedule-results []
+  let s-hosp-id hosp-id
+  if heuristic = "minimize-prep-time" or heuristic = "minimize-waiting-time"
+  [
+    set ors-list patches with [or-hosp-id = s-hosp-id] ;; obtain operating rooms of surgery's hospital
+  ]
+  ;; obtain each operating room's best schedule
   ask ors-list
   [
-    set schedule insert-item (length schedule) schedule pycor
+    ;; set schedule insert-item (length schedule) schedule pycor
   ]
-  show schedule
+  ;; compare schedules
 end
 
-to-report choose-best-schedule [s-type]
-  ;;TODO
-end
 
-to-report calculate-duration
-  ifelse surgery-type = "big"
-  [ report 90 ]
-  [ ifelse surgery-type = "medium"
-    [ report 60 ]
-    [ report 30 ]
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; OPERATING ROOM FUNCTIONS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; operating rooms procedure to insert surgery in its schedule
+to insert-surgery [s-day s-start-time s-duration s-prep-time s-surgeon s-surgery]
+  ifelse (length or-schedule) <= s-day
+  [
+    set or-schedule (insert-item (length or-schedule) or-schedule [])
+    let or-schedule-day (item s-day or-schedule)
+    set or-schedule-day (insert-item (length or-schedule-day) or-schedule-day s-surgery)
+    set or-schedule (replace-item s-day or-schedule or-schedule-day)
+  ]
+  [
+    let or-schedule-day (item s-day or-schedule)
+    set or-schedule-day (insert-item (length or-schedule-day) or-schedule-day s-surgery)
+    set or-schedule (replace-item s-day or-schedule or-schedule-day)
   ]
 end
 
-to-report calculate-schedule [specialty s-duration s-type]
-  ;; TODO
-end
-
-to-report calculate-prep-time [s-type day]
+;; operating room procedure to calculate surgery prep time
+to-report calculate-prep-time [s-type schedule-day]
   let s-prep-time 0
   ifelse s-type = "big"
   [set s-prep-time 30] ;; 30 minutes for equipment
@@ -120,6 +180,136 @@ to-report calculate-prep-time [s-type day]
   report s-prep-time
 end
 
+to-report calculate-transference-cost [s-hosp-id or-hospital-id]
+  ifelse s-hosp-id = or-hospital-id
+  [ report 0 ]
+  [
+    ;; TODO
+    report 0
+  ]
+end
+
+;; operating rooms procedure to calculate and return the best schedule for surgery. return [pxcor pycor day start-time prep-time transf-cost] TODO
+to-report calculate-schedule [specialty s-duration s-type s-hosp-id]
+;; TODO
+  ifelse empty? or-schedule
+  [
+    let s-prep-time (calculate-prep-time s-type [])
+    let s-trans-cost (calculate-transference-cost s-hosp-id or-hosp-id)
+    report (list pxcor pycor 0 0 s-prep-time s-trans-cost)
+  ]
+  [
+    let index 0
+    let stop-day-analysis? false
+    let potential-schedules [] ;; [day start-time prep-time]
+    while [index <= (length or-schedule) and not stop-day-analysis?] ;;um dia mais além!!
+    [
+      ifelse index = (length or-schedule)
+      [
+        let s-prep-time (calculate-prep-time s-type [])
+        set potential-schedules (insert-item (length potential-schedules) potential-schedules (list (length potential-schedules) 0 s-prep-time))
+      ]
+      [
+        let day (item index or-schedule)
+        ;; TODO
+      ]
+      set index (index + 1)
+    ]
+  ]
+end
+
+;; obtain the free time blocks of a operating room in a day TODO TESTED
+to-report get-day-free-time [schedule-day s-duration s-prep-time or-hospital-id]
+  let free-time (list (list 0 (operating-hours * 60)))
+  let index 0
+  let s-start-time 0 ;; DUMMY
+  let s-h-duration 20 ;; DUMMY
+  while [index < (length schedule-day)]
+  [
+    show (word "free time " free-time)
+    ask surgeries with [surgery-id = (item index schedule-day)]
+    [
+      let s-start-time start-time
+      let s-h-duration (get-duration-hospital s-duration or-hospital-id)
+
+
+    let end-surgery (s-start-time + s-prep-time + s-h-duration)
+    while [index-free-time < (length free-time)]
+    [
+      if end-surgery > (item 0 (item index-free-time free-time)) and s-start-time < (item 1 (item index-free-time free-time))
+      [
+        let substitute []
+        let index-to-add (index-free-time + 1)
+        if s-start-time > (item 0 (item index-free-time free-time))
+        [
+          set free-time (insert-item index-to-add free-time (list (item 0 (item index-free-time free-time)) s-start-time))
+          set index-to-add (index-to-add + 1)
+        ]
+
+        if end-surgery < (item 1 (item index-free-time free-time))
+        [ set free-time (insert-item index-to-add free-time (list end-surgery (item 1 (item index-free-time free-time)))) ]
+
+        set free-time (remove-item index-free-time free-time)
+      ]
+      set index-free-time (index-free-time + 1)
+    ]
+    ;]
+    set s-start-time (end-surgery + 5);; DUMMY
+    set index (index + 1)
+  ]
+  report free-time
+end
+
+;; parse surgery duration array to obtain duration for one hospital
+to-report get-duration-hospital [s-duration or-hospital-id]
+  let index 0
+  while [index < (length s-duration)]
+  [
+    if (item 0 (item index s-duration)) = or-hospital-id
+    [
+      report (item 1 (item index s-duration))
+    ]
+    set index (index + 1)
+  ]
+  report -1
+end
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; HOSPITAL FUNCTIONS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; Function to get surgeon of the specialty with the most free time. returns [hospital-id surgeon-id surgeon-expertise]
+to-report get-surgeon [s-hosp-id specialty]
+  let all-surgeons []
+  ask surgeons with [surgeon-hosp-id = s-hosp-id and surgeon-specialty = specialty]
+  [
+    set all-surgeons insert-item (length all-surgeons) all-surgeons get-occupied-time
+  ]
+  let min-value (item 2 (item 0 all-surgeons))
+  let best-surgeon (item 0 (item 0 all-surgeons))
+  let expertise (item 3 (item 0 all-surgeons))
+  foreach all-surgeons
+  [
+    selected-surgeon -> if min-value > (item 2 selected-surgeon)
+    [
+      set min-value (item 2 selected-surgeon)
+      set best-surgeon (item 0 selected-surgeon)
+      set expertise (item 3 selected-surgeon)
+    ]
+  ]
+  report (list s-hosp-id best-surgeon expertise)
+end
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; SURGEON FUNCTIONS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; obtain a surgeons occupied time. returns [surgeon-id hospital-id occupied-time expertise]
+to-report get-occupied-time
+  ;; TODO
+  report (list surgeon-id surgeon-hosp-id (random 100) surgeon-expertise) ;; [surgeon-id hospital-id occupied-time expertise]
+end
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; LOAD DATA ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 ;; id,urgency,surgery-type,surgery-specialty
 to create-surgeries-data
   file-open (word data-folder "/surgeries.csv")
@@ -128,6 +318,7 @@ to create-surgeries-data
     create-surgeries 1 [
       set size 1
       setxy -15 15
+      set duration []
       set surgery-id item 0 data
       set urgency item 1 data
       set surgery-type item 2 data
@@ -152,7 +343,7 @@ to create-hospitals-data
   let or-medium 0
   let or-small 0
   let last-or 0
-  random-seed
+  random-seed 11
   while [ not file-at-end? ] [
     let data csv:from-row file-read-line
     let hospital-color (random 140)
@@ -201,6 +392,24 @@ to create-surgeons-data
       set surgeon-id item 0 data
       set surgeon-specialty item 1 data
       set surgeon-hosp-id item 2 data
+      ;; TODO: add expertise to csvs
+      let expertise (random 3)
+      ifelse expertise = 1
+      [
+        set surgeon-expertise "new"
+        set color 79
+      ]
+      [
+        ifelse expertise = 2
+        [
+          set surgeon-expertise "veteran"
+          set color 77
+        ]
+        [
+          set surgeon-expertise "expert"
+          set color 75
+        ]
+      ]
     ]
   ]
   file-close
@@ -287,6 +496,21 @@ data/simple_example
 1
 0
 String
+
+SLIDER
+10
+153
+189
+186
+operating-hours
+operating-hours
+4
+24
+12.0
+1
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
