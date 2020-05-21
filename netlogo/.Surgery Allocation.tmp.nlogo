@@ -71,16 +71,12 @@ to setup
 end
 
 to go
-
-  ;ask (item 0 ordered-surgeries)
-  ;[
-  ;  allocate-operating-block
-  ;]
   foreach ordered-surgeries
   [
     first-surgery -> ask first-surgery [
       allocate-operating-block
     ]
+    move-surgeries
     tick
     update-plots
   ]
@@ -97,6 +93,19 @@ end
 ;; order surgeries by urgency
 to order-surgeries
   set ordered-surgeries sort-on [(- urgency)] surgeries
+end
+
+;; move surgeries
+to navigate-surgeries
+  ask surgeries with [assigned-or-coords != 0]
+  [
+    let x item 0 assigned-or-coords
+    let y item 1 assigned-or-coords
+
+    if any? patches with [pxcor = x and pycor = y]
+    [set heading towards one-of patches with [pxcor = x and pycor = y] fd 1]
+  ]
+  while
 end
 
 ;; obtain best surgeon that would do the surgery in each hospital. heuristic -> most free time
@@ -185,11 +194,11 @@ to allocate-operating-block
   set final-hosp-id assigned-or-hosp-id
   let a-surgeon assigned-surgeon
   let a-duration actual-duration
-
+  let assigned-surgeon-or-coords assigned-or-coords
   ask surgeons with [surgeon-id = a-surgeon]
   [
     insert-surgery-surgeon (item 2 best-schedule) a-duration s-id
-    surgeon-navigate (assigned-or-coords)
+    surgeon-navigate (assigned-surgeon-or-coords)
   ]
   surgery-navigate
   update-global-variables assigned-day prep-time
@@ -223,16 +232,6 @@ to-report get-best-schedule-surgery [available-schedules]
     set index (index + 1)
   ]
   report best-schedule
-end
-
-to surgery-navigate
-   let x item 0 assigned-or-coords
-   let y item 1 assigned-or-coords
-
-  ask surgeries [
-    If any? Patches with[  pxcor = x and pycor = y ]
-    [set heading towards one-of patches with[ pxcor =  x and pycor = y ] fd 1]
-  ]
 end
 
 
@@ -327,7 +326,8 @@ to-report compute-best-schedule [available-schedules]
     [
       if heuristic = "minimize-waiting-time"
       [
-        ;;TODO
+        if (item 0 (item 0 (item 2 (item 0 available-schedules)))) < (item 0 (item 1 best-schedule))
+        [ set best-schedule (list (item 0 (item index available-schedules)) (item 0 (item 2 (item index available-schedules))) (item 1 (item index available-schedules)))]
       ]
     ]
     set index (index + 1)
@@ -558,13 +558,11 @@ to insert-surgery-surgeon [s-day s-duration s-surgery]
 end
 
 to surgeon-navigate [coords]
- let x item 0 coords
- let y item 1 coords
+  let x item 0 coords
+  let y item 1 coords
 
-  ask surgeons [
-    If any? Patches with[  pxcor = x and pycor = y ]
-    [set heading towards one-of patches with[ pxcor =  x and pycor = y ] fd 1]
-  ]
+  if any? patches with[  pxcor = x and pycor = y ]
+  [set heading towards one-of patches with[ pxcor =  x and pycor = y ] fd 1]
 end
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; LOAD DATA ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1129,7 +1127,7 @@ false
 Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 @#$#@#$#@
-NetLogo 6.1.1
+NetLogo 6.0.4
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
