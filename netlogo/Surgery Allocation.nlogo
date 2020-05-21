@@ -640,8 +640,7 @@ to create-surgeons-data
       set surgeon-schedule []
       set occupied-time 0
       set xcor (-15 + surgeon-hosp-id * 3)
-      ;; TODO: add expertise to csvs
-      let expertise (random 3)
+      let expertise item 3 data
       ifelse expertise = 1
       [
         set surgeon-expertise "new"

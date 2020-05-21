@@ -575,7 +575,6 @@ to create-surgeries-data
       set hosp-id item 4 data
       set xcor -15
       set ycor (18 - hosp-id * 3)
-
       ifelse urgency = 1
       [set color green]
       [
@@ -631,7 +630,7 @@ to create-surgeons-data
   while [ not file-at-end? ] [
     let data csv:from-row file-read-line
     create-surgeons 1 [
-      set size 1
+      set size 1.5
       set color 5
       set ycor -15
       set shape "person"
@@ -642,7 +641,7 @@ to create-surgeons-data
       set occupied-time 0
       set xcor (-15 + surgeon-hosp-id * 3)
       ;; TODO: add expertise to csvs
-      let expertise (random 3)
+      let expertise
       ifelse expertise = 1
       [
         set surgeon-expertise "new"
