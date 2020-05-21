@@ -49,6 +49,7 @@ surgeons-own [
   surgeon-hosp-id
   surgeon-expertise
   surgeon-schedule ;; bidimensional list: each row represents a day; each column represents a surgery
+  occupied-time
 ]
 
 
@@ -56,6 +57,7 @@ surgeons-own [
 
 to setup
   clear-all
+  clear-plot
   reset-ticks
   set total-waiting-time 0
   set total-surgeries 0
@@ -76,20 +78,28 @@ to go
   ;]
   foreach ordered-surgeries
   [
-    first-surgery -> ask first-surgery [allocate-operating-block]
+    first-surgery -> ask first-surgery [
+      allocate-operating-block
+    ]
     tick
+    update-plots
+  ]
+
+  ask patches with [or-hosp-id != 0]
+  [
+    show or-schedule
   ]
 end
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; GLOBAL FUNCTIONS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; order surgeries by urgency TESTED
+;; order surgeries by urgency
 to order-surgeries
   set ordered-surgeries sort-on [(- urgency)] surgeries
 end
 
-;; obtain best surgeon that would do the surgery in each hospital. heuristic -> most free time TESTED
+;; obtain best surgeon that would do the surgery in each hospital. heuristic -> most free time
 to-report get-surgeon-per-hospital [specialty]
   let hospitals-surgeon []
   ask hospitals
@@ -121,11 +131,10 @@ end
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; SURGERY FUNCTIONS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; allocation of surgeons and ors TODO
+;; allocation of surgeons and ors
 to allocate-operating-block
   ;; get surgeon who would perform the surgery in each hospital
   set surgeon-per-hospital (get-surgeon-per-hospital surgery-specialty) ;[hospital-id surgeon-id surgeon-expertise]
-  show (word "surgeon-per-hospital: " surgeon-per-hospital)
 
   ;; obtain duration of the surgery with each surgeon
   foreach surgeon-per-hospital
@@ -152,15 +161,14 @@ to allocate-operating-block
   [
     op-room ->
     let best-or-schedule (calculate-schedule
-      (item 0 op-room) (item 1 op-room) (get-duration-hospital duration (item 1 op-room)) surgery-type hosp-id (get-surgeon-hospital surgeon-per-hospital (item 1 op-room)))
+      (item 0 op-room) (item 1 op-room) (get-duration-hospital duration (item 1 op-room)) surgery-type surgery-specialty hosp-id (get-surgeon-hospital surgeon-per-hospital (item 1 op-room)))
     ;; best-or-schedule -> [pxcor pycor day time-block prep-time]
     set best-or-schedule (list (item 2 op-room) (item 3 op-room) (item 0 best-or-schedule) (item 1 best-or-schedule) (item 2 best-or-schedule))
     set available-schedules (lput best-or-schedule available-schedules)
   ]
-  show (word "resulting schedules: " available-schedules)
-  ;; compare schedules TODO
+  ;; show (word "resulting schedules: " available-schedules)
   let best-schedule (get-best-schedule-surgery available-schedules)
-  show (word "best schedule: " best-schedule)
+  ;; show (word "best schedule: " best-schedule)
   let assigned-or-hosp-id 0
   let s-dur duration
   let s-id surgery-id
@@ -169,18 +177,24 @@ to allocate-operating-block
     set assigned-or-hosp-id or-hosp-id
     insert-surgery (item 2 best-schedule) (item 0 (item 3 best-schedule)) (get-duration-hospital s-dur or-hosp-id) (item 4 best-schedule) s-id
   ]
-  set actual-duration (get-duration-hospital duration or-hosp-id)
-  set assigned-surgeon (get-surgeon-hospital surgeon-per-hospital or-hosp-id)
+  set actual-duration (get-duration-hospital duration assigned-or-hosp-id)
+  set assigned-surgeon (get-surgeon-hospital surgeon-per-hospital assigned-or-hosp-id)
   set assigned-or-coords (list (item 0 best-schedule) (item 1 best-schedule))
   set prep-time (item 4 best-schedule)
   set start-time (item 0 (item 3 best-schedule))
   set assigned-day (item 2 best-schedule)
   set final-hosp-id assigned-or-hosp-id
+  let a-surgeon assigned-surgeon
+  let a-duration actual-duration
+  ask surgeons with [surgeon-id = a-surgeon]
+  [
+    insert-surgery-surgeon (item 2 best-schedule) a-duration s-id
+  ]
+  surgery-navigate
   update-global-variables assigned-day prep-time
 end
 
 to update-global-variables [waiting-time s-prep-time]
-  show (sentence "waiting time: " waiting-time " - prep time: " s-prep-time)
   set total-surgeries (total-surgeries + 1)
   set total-waiting-time (total-waiting-time + waiting-time)
   set max-waiting-time (max (list max-waiting-time waiting-time))
@@ -188,7 +202,6 @@ to update-global-variables [waiting-time s-prep-time]
   set max-prep-time (max (list max-prep-time prep-time))
   set average-waiting-time (total-waiting-time / total-surgeries)
   set average-prep-time (total-prep-time / total-surgeries)
-  update-plots
 end
 
 to-report get-best-schedule-surgery [available-schedules]
@@ -211,6 +224,11 @@ to-report get-best-schedule-surgery [available-schedules]
   report best-schedule
 end
 
+to surgery-navigate
+;; TODO -> while cycle to navigate until or (OR coords are saved in assigned-or-coords) -> change angle of turtle to be directioned towards the OR and walk until it reaches it
+  show (word "or coords" assigned-or-coords)
+end
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; OPERATING ROOM FUNCTIONS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -231,7 +249,7 @@ to insert-surgery [s-day s-start-time s-duration s-prep-time s-surgery]
 end
 
 ;; operating room procedure to calculate surgery prep time TODO
-to-report calculate-prep-time [s-type schedule-day]
+to-report calculate-prep-time [s-type s-specialty schedule-day]
   ;; set base preparation time to bring equipment to the room, according to type of surgery
   let s-prep-time 0
   ifelse s-type = "big"
@@ -241,28 +259,25 @@ to-report calculate-prep-time [s-type schedule-day]
     [set s-prep-time 20] ;; 20 minutes for equipment
     [set s-prep-time 10] ;; 10 minutes for equipment
   ]
-  ;; TODO - check if there was a surgery before with the same type
-  set s-prep-time (s-prep-time + 10) ;; 10 minutes for other activities
+  let surgery-same-spec 1
+  ask surgeries with [ (member? surgery-id schedule-day) = true]
+  [
+    if s-specialty = surgery-specialty
+    [
+      set surgery-same-spec 0
+    ]
+  ]
+  set s-prep-time (s-prep-time * surgery-same-spec + 20) ;; 20 minutes for other activities
   report s-prep-time
 end
 
-;; calculate transference cost between hospitals TODO
-to-report calculate-transference-cost [s-hosp-id or-hospital-id]
-  ifelse s-hosp-id = or-hospital-id
-  [ report 0 ]
-  [
-    ;; TODO
-    report 0
-  ]
-end
-
-;; operating rooms procedure to calculate and return the best schedule for surgery. return [day start-time prep-time] TODO
-to-report calculate-schedule [operating-room-schedule or-hospital-id s-duration s-type s-hosp-id s-surgeon]
+;; operating rooms procedure to calculate and return the best schedule for surgery. return [day start-time prep-time]
+to-report calculate-schedule [operating-room-schedule or-hospital-id s-duration s-type s-specialty s-hosp-id s-surgeon]
   ;; TODO add transference cost
   let available-schedules [] ;; list of lists [[day prep-time [start-time end-time]]]
   ifelse empty? operating-room-schedule
   [
-    let s-prep-time (calculate-prep-time s-type [])
+    let s-prep-time (calculate-prep-time s-type s-specialty [])
     set available-schedules (insert-item 0 available-schedules (list 0 s-prep-time (list (list 0 (operating-hours * 60))))) ;; if schedule is empty, the whole first day is available
   ]
   [
@@ -271,12 +286,12 @@ to-report calculate-schedule [operating-room-schedule or-hospital-id s-duration 
     [
       ifelse index = (length operating-room-schedule) ;; the whole last day is available
       [
-        let s-prep-time (calculate-prep-time s-type [])
+        let s-prep-time (calculate-prep-time s-type s-specialty [])
         set available-schedules (lput (list (length operating-room-schedule) s-prep-time (list (list 0 (operating-hours * 60)))) available-schedules)
       ]
       [
         let schedule-day (item index operating-room-schedule)
-        let s-prep-time (calculate-prep-time s-type schedule-day)
+        let s-prep-time (calculate-prep-time s-type s-specialty schedule-day)
         set available-schedules (lput (list index s-prep-time (get-day-free-time schedule-day or-hospital-id (s-duration + s-prep-time))) available-schedules)
       ]
       set index (index + 1)
@@ -415,20 +430,25 @@ end
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; SURGEON FUNCTIONS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; obtain a surgeons occupied time. returns [surgeon-id hospital-id occupied-time expertise] TODO!!
+;; obtain a surgeons occupied time. returns [surgeon-id hospital-id occupied-time expertise]
 to-report get-occupied-time
-  ;; TODO
-  report (list surgeon-id surgeon-hosp-id (random 100) surgeon-expertise) ;; [surgeon-id hospital-id occupied-time expertise]
+  report (list surgeon-id surgeon-hosp-id occupied-time surgeon-expertise)
 end
 
-;; check available schedules for surgeon NOT TESTED TODO -> what if there is no availability in the said schedules?
+;; check available schedules for surgeon TODO -> what if there is no availability in the said schedules?
 to-report check-surgeon-availability [surg-schedule available-schedules surgery-duration] ;; available-schedules -> list of [day prep-time [[start-time end-time] ...]]
   let index 0
+  ;; show "check-surgeon-availability"
   set surg-schedule (obtain-schedule surg-schedule)
+  ;; show (word "surgeon-schedule " surg-schedule)
+  ;; show (word "available-schedules " available-schedules)
   while [index < (length available-schedules)]
   [
+    ;; show (word "index " index)
     let day-available-schedule (item 2 (item index available-schedules))
     let day (item 0 (item index available-schedules))
+    ;; show (word "day of available schedule " day)
+    ;; show (word "day available schedule " day-available-schedule)
     if day < (length surg-schedule) ;; if surgeon has surgeries scheduled in this day or days after
     [
       if not empty? (item day surg-schedule) ;; if surgeon has surgeries scheduled in this day -> compute times where both the OR and the surgeon are available
@@ -447,15 +467,14 @@ to-report check-surgeon-availability [surg-schedule available-schedules surgery-
               let index-to-add (index-day-or + 1)
               if (item 0 sds) > (item 0 das)
               [
-                set das (insert-item index-to-add das (list (item 0 das) (item 0 sds)))
+                set day-available-schedule (insert-item index-to-add day-available-schedule (list (item 0 das) (item 0 sds)))
                 set index-to-add (index-to-add + 1)
               ]
 
               if (item 1 sds) < (item 1 das)
-              [ set das (insert-item index-to-add das (list (item 1 sds) (item 1 das))) ]
+              [ set day-available-schedule (insert-item index-to-add day-available-schedule (list (item 1 sds) (item 1 das))) ]
 
-              set das (remove-item index-day-or das)
-              set day-available-schedule (replace-item index-day-or day-available-schedule das)
+              set day-available-schedule (remove-item index-day-or day-available-schedule)
             ]
             set index-day-s (index-day-s + 1)
           ]
@@ -463,6 +482,7 @@ to-report check-surgeon-availability [surg-schedule available-schedules surgery-
         ]
       ]
     ]
+    ;; show (word "day available schedule after " day-available-schedule)
     set index (index + 1)
   ]
 
@@ -491,8 +511,9 @@ to-report check-surgeon-availability [surg-schedule available-schedules surgery-
   report available-schedules
 end
 
-;; translate surgery ids to time blocks NOT TESTED
+;; translate surgery ids to time blocks
 to-report obtain-schedule [s-schedule]
+  ;; show (word "obtain-schedule " s-schedule)
   let time-block-schedule []
   let index 0
   while [index < (length s-schedule)]
@@ -506,14 +527,31 @@ to-report obtain-schedule [s-schedule]
       [
         let s-start-time (start-time + prep-time)
         let s-end-time (s-start-time + actual-duration)
-        set day-schedule (lput (list s-start-time) day-schedule)
+        set day-schedule (lput (list s-start-time s-end-time) day-schedule)
       ]
       set index-j (index-j + 1)
     ]
     set time-block-schedule (lput day-schedule time-block-schedule)
     set index (index + 1)
   ]
+  ;; show (word "obtain-schedule results: " time-block-schedule)
   report time-block-schedule
+end
+
+;; insert surgery in surgeon's schedule TESTED
+to insert-surgery-surgeon [s-day s-duration s-surgery]
+  while [(length surgeon-schedule) <= s-day]
+  [
+    set surgeon-schedule (lput [] surgeon-schedule)
+  ]
+  let surgeon-schedule-day (item s-day surgeon-schedule)
+  set surgeon-schedule-day (insert-item (length surgeon-schedule-day) surgeon-schedule-day s-surgery)
+  set surgeon-schedule (replace-item s-day surgeon-schedule surgeon-schedule-day)
+  set occupied-time (occupied-time + s-duration)
+end
+
+to surgeon-navigate [coords]
+;; TODO -> while cycle to navigate until coords -> change angle of turtle to be directioned towards the OR and walk until it reaches it
 end
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; LOAD DATA ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -525,13 +563,14 @@ to create-surgeries-data
     let data csv:from-row file-read-line
     create-surgeries 1 [
       set size 1
-      setxy -15 15
       set duration []
       set surgery-id item 0 data
       set urgency item 1 data
       set surgery-type item 2 data
       set surgery-specialty item 3 data
       set hosp-id item 4 data
+      set xcor -15
+      set ycor (18 - hosp-id * 3)
       ifelse urgency = 1
       [set color green]
       [
@@ -589,11 +628,13 @@ to create-surgeons-data
     create-surgeons 1 [
       set size 1
       set color 5
-      setxy -15 -15
+      set ycor -15
       set surgeon-id item 0 data
       set surgeon-specialty item 1 data
       set surgeon-hosp-id item 2 data
       set surgeon-schedule []
+      set occupied-time 0
+      set xcor (-15 + surgeon-hosp-id * 3)
       ;; TODO: add expertise to csvs
       let expertise (random 3)
       ifelse expertise = 1
@@ -708,19 +749,19 @@ operating-hours
 operating-hours
 4
 24
-8.0
+4.0
 1
 1
 NIL
 HORIZONTAL
 
 PLOT
-44
-257
-244
-407
+14
+255
+214
+405
 Waiting Time
-Number of Surgeries
+Ticks
 Waiting Time
 0.0
 10.0
