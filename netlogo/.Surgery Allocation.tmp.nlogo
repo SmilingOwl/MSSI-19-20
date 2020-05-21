@@ -185,11 +185,11 @@ to allocate-operating-block
   set final-hosp-id assigned-or-hosp-id
   let a-surgeon assigned-surgeon
   let a-duration actual-duration
-
+  let assigned-surgeon-or-coords assigned-or-coords
   ask surgeons with [surgeon-id = a-surgeon]
   [
     insert-surgery-surgeon (item 2 best-schedule) a-duration s-id
-    surgeon-navigate (assigned-or-coords)
+    surgeon-navigate (assigned-surgeon-or-coords)
   ]
   surgery-navigate
   update-global-variables assigned-day prep-time
@@ -254,7 +254,7 @@ to insert-surgery [s-day s-start-time s-duration s-prep-time s-surgery]
   ]
 end
 
-;; operating room procedure to calculate surgery prep time TODO
+;; operating room procedure to calculate surgery prep time
 to-report calculate-prep-time [s-type s-specialty schedule-day]
   ;; set base preparation time to bring equipment to the room, according to type of surgery
   let s-prep-time 0
@@ -313,6 +313,7 @@ to-report calculate-schedule [operating-room-schedule or-hospital-id s-duration 
 end
 
 ;; compute best schedule out of schedules received as arguments taking into consideration the used heuristic TODO
+
 ;; returns [day time-block prep-time]
 to-report compute-best-schedule [available-schedules]
   let best-schedule (list (item 0 (item 0 available-schedules)) (item 0 (item 2 (item 0 available-schedules))) (item 1 (item 0 available-schedules)))
@@ -439,7 +440,14 @@ end
 
 ;; obtain a surgeons occupied time. returns [surgeon-id hospital-id occupied-time expertise]
 to-report get-occupied-time
-  report (list surgeon-id surgeon-hosp-id occupied-time surgeon-expertise)
+  let expertise
+  if surgeon-expertise = "new"
+  [set expertise 1]
+
+  if surgeon-expertise = "veteran"
+    [set expertise 2]
+
+  report (list surgeon-id surgeon-hosp-id (occupied-time / expertise) surgeon-expertise)
 end
 
 ;; check available schedules for surgeon TODO -> what if there is no availability in the said schedules?
@@ -566,6 +574,7 @@ to surgeon-navigate [coords]
     [set heading towards one-of patches with[ pxcor =  x and pycor = y ] fd 1]
   ]
 end
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; LOAD DATA ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
