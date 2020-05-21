@@ -76,7 +76,6 @@ to go
     first-surgery -> ask first-surgery [
       allocate-operating-block
     ]
-    move-surgeries
     tick
     update-plots
   ]
@@ -93,19 +92,6 @@ end
 ;; order surgeries by urgency
 to order-surgeries
   set ordered-surgeries sort-on [(- urgency)] surgeries
-end
-
-;; move surgeries
-to navigate-surgeries
-  ask surgeries with [assigned-or-coords != 0]
-  [
-    let x item 0 assigned-or-coords
-    let y item 1 assigned-or-coords
-
-    if any? patches with [pxcor = x and pycor = y]
-    [set heading towards one-of patches with [pxcor = x and pycor = y] fd 1]
-  ]
-  while
 end
 
 ;; obtain best surgeon that would do the surgery in each hospital. heuristic -> most free time
@@ -234,6 +220,16 @@ to-report get-best-schedule-surgery [available-schedules]
   report best-schedule
 end
 
+to surgery-navigate
+   let x item 0 assigned-or-coords
+   let y item 1 assigned-or-coords
+
+  ask surgeries [
+    If any? Patches with[  pxcor = x and pycor = y ]
+    [set heading towards one-of patches with[ pxcor =  x and pycor = y ] fd 1]
+  ]
+end
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; OPERATING ROOM FUNCTIONS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -253,7 +249,7 @@ to insert-surgery [s-day s-start-time s-duration s-prep-time s-surgery]
   ]
 end
 
-;; operating room procedure to calculate surgery prep time
+;; operating room procedure to calculate surgery prep time TODO
 to-report calculate-prep-time [s-type s-specialty schedule-day]
   ;; set base preparation time to bring equipment to the room, according to type of surgery
   let s-prep-time 0
@@ -312,7 +308,6 @@ to-report calculate-schedule [operating-room-schedule or-hospital-id s-duration 
 end
 
 ;; compute best schedule out of schedules received as arguments taking into consideration the used heuristic TODO
-
 ;; returns [day time-block prep-time]
 to-report compute-best-schedule [available-schedules]
   let best-schedule (list (item 0 (item 0 available-schedules)) (item 0 (item 2 (item 0 available-schedules))) (item 1 (item 0 available-schedules)))
@@ -440,14 +435,7 @@ end
 
 ;; obtain a surgeons occupied time. returns [surgeon-id hospital-id occupied-time expertise]
 to-report get-occupied-time
-  let expertise
-  if surgeon-expertise = "new"
-  [set expertise 1]
-
-  if surgeon-expertise = "veteran"
-    [set expertise 2]
-
-  report (list surgeon-id surgeon-hosp-id (occupied-time / expertise) surgeon-expertise)
+  report (list surgeon-id surgeon-hosp-id occupied-time surgeon-expertise)
 end
 
 ;; check available schedules for surgeon TODO -> what if there is no availability in the said schedules?
@@ -572,7 +560,6 @@ to surgeon-navigate [coords]
   if any? patches with[  pxcor = x and pycor = y ]
   [set heading towards one-of patches with[ pxcor =  x and pycor = y ] fd 1]
 end
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; LOAD DATA ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
