@@ -4,6 +4,9 @@ globals
   ordered-surgeries
   total-waiting-time
   total-surgeries
+  total-or
+  total-hospitals
+  total-surgeons
   average-waiting-time
   max-waiting-time
   total-prep-time
@@ -68,6 +71,9 @@ to setup
   create-hospitals-data
   create-surgeons-data
   order-surgeries
+  set total-hospitals count hospitals
+  set total-surgeons count surgeons
+  set total-or count patches with [pcolor != black]
 end
 
 to go
@@ -666,10 +672,10 @@ to create-surgeons-data
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-379
-10
-791
-423
+726
+66
+1176
+477
 -1
 -1
 9.854
@@ -682,8 +688,8 @@ GRAPHICS-WINDOW
 0
 0
 1
--20
-20
+-22
+22
 -20
 20
 0
@@ -693,10 +699,10 @@ ticks
 30.0
 
 BUTTON
-280
-15
-343
-48
+958
+19
+1021
+52
 NIL
 go
 NIL
@@ -710,20 +716,20 @@ NIL
 1
 
 CHOOSER
-10
+15
 14
-189
+194
 59
 heuristic
 heuristic
-"minimize-prep-time" "minimize-waiting-time" "across-hospitals"
+"minimize-prep-time" "minimize-waiting-time"
 1
 
 BUTTON
-209
-15
-272
-48
+887
+19
+950
+52
 NIL
 setup
 NIL
@@ -737,10 +743,10 @@ NIL
 1
 
 INPUTBOX
-10
-77
+15
+128
+193
 188
-137
 data-folder
 data\\simple_example
 1
@@ -748,15 +754,15 @@ data\\simple_example
 String
 
 SLIDER
-10
-153
-189
-186
+15
+204
+194
+237
 operating-hours
 operating-hours
 4
 24
-12.0
+11.0
 1
 1
 NIL
@@ -780,6 +786,123 @@ false
 PENS
 "default" 1.0 0 -2674135 true "" "plot average-waiting-time"
 "pen-1" 1.0 0 -11221820 true "" "plot max-waiting-time"
+
+MONITOR
+239
+70
+353
+115
+average prep time
+average-prep-time
+17
+1
+11
+
+MONITOR
+241
+182
+333
+227
+max prep time
+max-prep-time
+17
+1
+11
+
+MONITOR
+240
+126
+345
+171
+max waiting time
+max-waiting-time
+17
+1
+11
+
+MONITOR
+239
+12
+367
+57
+average waiting time
+average-waiting-time
+17
+1
+11
+
+MONITOR
+411
+113
+504
+158
+total surgeries
+total-surgeries
+17
+1
+11
+
+PLOT
+225
+255
+425
+405
+Preparation Time
+Ticks
+Preparation Time
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -13840069 true "" "plot average-prep-time"
+"pen-1" 1.0 0 -5825686 true "" "plot max-prep-time"
+
+CHOOSER
+15
+71
+153
+116
+heuristic2
+heuristic2
+"across hospitals" "same hospital"
+0
+
+MONITOR
+533
+176
+627
+221
+total surgeons
+total-surgeons
+17
+1
+11
+
+MONITOR
+412
+176
+502
+221
+total hospitals
+total-hospitals
+17
+1
+11
+
+MONITOR
+531
+113
+657
+158
+total operating room
+total-or
+17
+1
+11
 
 @#$#@#$#@
 ## WHAT IS IT?
