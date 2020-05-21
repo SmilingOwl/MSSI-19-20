@@ -624,7 +624,7 @@ to create-hospitals-data
   file-close
 end
 
-;; id,specialty,hospital
+;; id,specialty,hospital, expertise
 to create-surgeons-data
   file-open (word data-folder "/surgeons.csv")
   while [ not file-at-end? ] [
@@ -714,7 +714,7 @@ CHOOSER
 heuristic
 heuristic
 "minimize-prep-time" "minimize-waiting-time" "across-hospitals"
-0
+1
 
 BUTTON
 209

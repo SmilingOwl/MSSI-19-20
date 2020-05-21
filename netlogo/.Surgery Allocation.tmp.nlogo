@@ -624,7 +624,7 @@ to create-hospitals-data
   file-close
 end
 
-;; id,specialty,hospital
+;; id,specialty,hospital, expertise
 to create-surgeons-data
   file-open (word data-folder "/surgeons.csv")
   while [ not file-at-end? ] [
@@ -640,8 +640,7 @@ to create-surgeons-data
       set surgeon-schedule []
       set occupied-time 0
       set xcor (-15 + surgeon-hosp-id * 3)
-      ;; TODO: add expertise to csvs
-      let expertise
+      let expertise item  data
       ifelse expertise = 1
       [
         set surgeon-expertise "new"
@@ -715,7 +714,7 @@ CHOOSER
 heuristic
 heuristic
 "minimize-prep-time" "minimize-waiting-time" "across-hospitals"
-0
+1
 
 BUTTON
 209
