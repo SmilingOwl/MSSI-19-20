@@ -185,9 +185,11 @@ to allocate-operating-block
   set final-hosp-id assigned-or-hosp-id
   let a-surgeon assigned-surgeon
   let a-duration actual-duration
+
   ask surgeons with [surgeon-id = a-surgeon]
   [
     insert-surgery-surgeon (item 2 best-schedule) a-duration s-id
+    surgeon-navigate (assigned-or-coords)
   ]
   surgery-navigate
   update-global-variables assigned-day prep-time
@@ -224,15 +226,13 @@ to-report get-best-schedule-surgery [available-schedules]
 end
 
 to surgery-navigate
-;; TODO -> while cycle to navigate until or (OR coords are saved in assigned-or-coords) -> change angle of turtle to be directioned towards the OR and walk until it reaches it
    let x item 0 assigned-or-coords
    let y item 1 assigned-or-coords
+
   ask surgeries [
     If any? Patches with[  pxcor = x and pycor = y ]
-    [set heading towards one-of patches with[ pxcor =  x and ycor = y ] fd 1]
+    [set heading towards one-of patches with[ pxcor =  x and pycor = y ] fd 1]
   ]
-
-  show (word "or coords" assigned-or-coords)
 end
 
 
@@ -434,6 +434,7 @@ to-report get-surgeon [s-hosp-id specialty]
   report (list s-hosp-id best-surgeon expertise)
 end
 
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; SURGEON FUNCTIONS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; obtain a surgeons occupied time. returns [surgeon-id hospital-id occupied-time expertise]
@@ -557,7 +558,13 @@ to insert-surgery-surgeon [s-day s-duration s-surgery]
 end
 
 to surgeon-navigate [coords]
-;; TODO -> while cycle to navigate until coords -> change angle of turtle to be directioned towards the OR and walk until it reaches it
+ let x item 0 coords
+ let y item 1 coords
+
+  ask surgeons [
+    If any? Patches with[  pxcor = x and pycor = y ]
+    [set heading towards one-of patches with[ pxcor =  x and pycor = y ] fd 1]
+  ]
 end
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; LOAD DATA ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -678,8 +685,8 @@ GRAPHICS-WINDOW
 1
 1
 0
-1
-1
+0
+0
 1
 -20
 20
@@ -741,7 +748,7 @@ INPUTBOX
 188
 137
 data-folder
-data/simple_example
+data\\simple_example
 1
 0
 String
