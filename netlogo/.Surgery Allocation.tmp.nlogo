@@ -225,9 +225,11 @@ end
 
 to surgery-navigate
 ;; TODO -> while cycle to navigate until or (OR coords are saved in assigned-or-coords) -> change angle of turtle to be directioned towards the OR and walk until it reaches it
+   let x item 0 assigned-or-coords
+   let y item 1 assigned-or-coords
   ask surgeries [
-    If any? Patches with[ pcolor = 47]
-    [set heading towards one-of patches with[ pcolor = 47 ] fd 1]
+    If any? Patches with[  pxcor = x and pycor = y ]
+    [set heading towards one-of patches with[ pxcor =  x and ycor = y ] fd 1]
   ]
 
   show (word "or coords" assigned-or-coords)
@@ -640,7 +642,7 @@ to create-surgeons-data
       set surgeon-schedule []
       set occupied-time 0
       set xcor (-15 + surgeon-hosp-id * 3)
-      let expertise item  data
+      let expertise item 3 data
       ifelse expertise = 1
       [
         set surgeon-expertise "new"
