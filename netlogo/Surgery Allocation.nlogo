@@ -35,7 +35,7 @@ surgeries-own [
 
 hospitals-own [
   hospital-id
-  hospital-type
+  hospital-type                    ;; public or private
 ]
 
 patches-own [
@@ -48,7 +48,7 @@ surgeons-own [
   surgeon-specialty
   surgeon-hosp-id
   surgeon-expertise
-  surgeon-schedule ;; bidimensional list: each row represents a day; each column represents a surgery
+  surgeon-schedule                 ;; bidimensional list: each row represents a day; each column represents a surgery
   occupied-time
 ]
 
@@ -143,7 +143,6 @@ to allocate-operating-block
   ]
 
   ;; get operating rooms schedule
-
   let ors-list patches with [or-hosp-id != 0] ;; obtain all operating rooms
   let available-schedules []
   let s-hosp-id hosp-id
@@ -226,6 +225,11 @@ end
 
 to surgery-navigate
 ;; TODO -> while cycle to navigate until or (OR coords are saved in assigned-or-coords) -> change angle of turtle to be directioned towards the OR and walk until it reaches it
+  ask surgeries [
+    If any? Patches with[ pcolor = 47]
+    [set heading towards one-of patches with[ pcolor = 47 ] fd 1]
+  ]
+
   show (word "or coords" assigned-or-coords)
 end
 
@@ -749,7 +753,7 @@ operating-hours
 operating-hours
 4
 24
-4.0
+12.0
 1
 1
 NIL
@@ -1116,7 +1120,7 @@ false
 Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 @#$#@#$#@
-NetLogo 6.0.4
+NetLogo 6.1.1
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
