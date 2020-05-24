@@ -34,6 +34,7 @@ surgeries-own [
   hosp-id                          ;; initial hospital in which the patient was signed up for surgery
   final-hosp-id                    ;; assigned hospital after allocation
   actual-duration                  ;; int with actual duration of the surgery, in minutes
+  state
 ]
 
 hospitals-own [
@@ -53,12 +54,16 @@ surgeons-own [
   surgeon-expertise
   surgeon-schedule                 ;; bidimensional list: each row represents a day; each column represents a surgery
   occupied-time
+  surgeon-state
+  move-coords
 ]
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; INTERFACE FUNCTIONS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 to setup
+  set-patch-size 15
+  resize-world -15 15 -15 15
   clear-all
   clear-plot
   reset-ticks
@@ -82,14 +87,95 @@ to go
     first-surgery -> ask first-surgery [
       allocate-operating-block
     ]
-    tick
-    update-plots
   ]
 
   ask patches with [or-hosp-id != 0]
   [
     show or-schedule
   ]
+end
+
+to show-results
+  let time 0
+  let all-schedules []
+  ask patches with [or-hosp-id != 0]
+  [
+    set all-schedules (lput or-schedule all-schedules)
+  ]
+
+  let day 0
+  while [day <= max [assigned-day] of surgeries]
+  [
+    set time  0
+    while [time < 60 * operating-hours]
+    [
+      ask surgeries with [assigned-day = day and start-time = time]
+      [
+        update-global-variables assigned-day prep-time
+        facexy (item 0 assigned-or-coords) (item 1 assigned-or-coords)
+        set state "move"
+      ]
+      ask surgeries with [assigned-day = day and start-time + prep-time = time]
+      [
+        let selected-surgeon assigned-surgeon
+        let m-coords assigned-or-coords
+        ask surgeons with [surgeon-id = selected-surgeon]
+        [
+          set move-coords m-coords
+          set surgeon-state "move"
+        ]
+      ]
+      ask surgeries with [assigned-day = day and start-time + prep-time + actual-duration = time]
+      [
+        set state "hide"
+        let selected-surgeon assigned-surgeon
+        ask surgeons with [surgeon-id = selected-surgeon]
+        [
+          set move-coords (list 13 (15 - surgeon-hosp-id * 3))
+          set surgeon-state "move"
+        ]
+      ]
+      move
+      set time (time + 1)
+    ]
+    set day (day + 1)
+  ]
+end
+
+to move
+  ask surgeries with [state = "move"]
+  [
+    facexy (item 0 assigned-or-coords) (item 1 assigned-or-coords)
+    forward 1
+    let patch-coords (list 0 0)
+    ask patch-here
+    [
+      set patch-coords (list pxcor pycor)
+    ]
+    if (item 0 patch-coords) = (item 0 assigned-or-coords) and (item 1 patch-coords) = (item 1 assigned-or-coords)
+    [
+      set state "arrived"
+    ]
+  ]
+  ask surgeries with [state = "hide"]
+  [
+    hide-turtle
+  ]
+  ask surgeons with [surgeon-state = "move"]
+  [
+    facexy (item 0 move-coords) (item 1 move-coords)
+    forward 1
+    let patch-coords (list 0 0)
+    ask patch-here
+    [
+      set patch-coords (list pxcor pycor)
+    ]
+    if (item 0 patch-coords) = (item 0 move-coords) and (item 1 patch-coords) = (item 1 move-coords)
+    [
+      set surgeon-state "operating"
+    ]
+  ]
+  tick
 end
 
 
@@ -166,9 +252,7 @@ to allocate-operating-block
     set best-or-schedule (list (item 2 op-room) (item 3 op-room) (item 0 best-or-schedule) (item 1 best-or-schedule) (item 2 best-or-schedule))
     set available-schedules (lput best-or-schedule available-schedules)
   ]
-  ;; show (word "resulting schedules: " available-schedules)
   let best-schedule (get-best-schedule-surgery available-schedules)
-  ;; show (word "best schedule: " best-schedule)
   let assigned-or-hosp-id 0
   let s-dur duration
   let s-id surgery-id
@@ -190,10 +274,7 @@ to allocate-operating-block
   ask surgeons with [surgeon-id = a-surgeon]
   [
     insert-surgery-surgeon (item 2 best-schedule) a-duration s-id
-    surgeon-navigate (assigned-surgeon-or-coords)
   ]
-  surgery-navigate
-  update-global-variables assigned-day prep-time
 end
 
 to update-global-variables [waiting-time s-prep-time]
@@ -575,15 +656,16 @@ to create-surgeries-data
   while [ not file-at-end? ] [
     let data csv:from-row file-read-line
     create-surgeries 1 [
-      set size 1
+      set size 1.5
+      set shape "person"
       set duration []
       set surgery-id item 0 data
       set urgency item 1 data
       set surgery-type item 2 data
       set surgery-specialty item 3 data
       set hosp-id item 4 data
-      set xcor -15
-      set ycor (18 - hosp-id * 3)
+      set xcor -13
+      set ycor (15 - hosp-id * 3)
       ifelse urgency = 1
       [set color green]
       [
@@ -611,7 +693,7 @@ to create-hospitals-data
     create-hospitals 1 [
       set size 2
       set color black
-      setxy 20 20
+      setxy 15 15
       set hospital-id item 0 data
       set hospital-type item 1 data
       set or-number item 2 data
@@ -619,8 +701,8 @@ to create-hospitals-data
     let i 0
     while [i < or-number]
     [
-      let y (40 - ((last-or * 4 + 2) mod 40) - 20)
-      let x (38 - (floor ((last-or * 4 + 2) / 40)) * 4 - 20)
+      let y (15 - ((last-or * 4 + 2) mod 30))
+      let x (5 - (floor ((last-or * 4 + 2) / 30)) * 4)
       ask patches with [pxcor = x and pycor = y] [
         set pcolor hospital-color
         set or-hosp-id item 0 data
@@ -641,14 +723,14 @@ to create-surgeons-data
     create-surgeons 1 [
       set size 1.5
       set color 5
-      set ycor -15
       set shape "person"
       set surgeon-id item 0 data
       set surgeon-specialty item 1 data
       set surgeon-hosp-id item 2 data
       set surgeon-schedule []
       set occupied-time 0
-      set xcor (-15 + surgeon-hosp-id * 3)
+      set xcor 13
+      set ycor (15 - surgeon-hosp-id * 3)
       let expertise item 3 data
       ifelse expertise = 1
       [
@@ -672,13 +754,13 @@ to create-surgeons-data
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-726
-66
-1176
-477
+687
+16
+1157
+487
 -1
 -1
-9.854
+15.0
 1
 10
 1
@@ -688,22 +770,22 @@ GRAPHICS-WINDOW
 0
 0
 1
--22
-22
--20
-20
-0
-0
+-15
+15
+-15
+15
+1
+1
 1
 ticks
 30.0
 
 BUTTON
-958
-19
-1021
-52
-NIL
+244
+54
+414
+87
+Allocate Operating Blocks
 go
 NIL
 1
@@ -723,14 +805,14 @@ CHOOSER
 heuristic
 heuristic
 "minimize-prep-time" "minimize-waiting-time"
-1
+0
 
 BUTTON
-887
+244
 19
-950
+413
 52
-NIL
+Setup Experiment
 setup
 NIL
 1
@@ -762,7 +844,7 @@ operating-hours
 operating-hours
 4
 24
-11.0
+10.0
 1
 1
 NIL
@@ -784,14 +866,13 @@ true
 false
 "" ""
 PENS
-"default" 1.0 0 -2674135 true "" "plot average-waiting-time"
-"pen-1" 1.0 0 -11221820 true "" "plot max-waiting-time"
+"Average" 1.0 0 -2674135 true "" "plot average-waiting-time"
 
 MONITOR
-239
-70
+436
+308
+561
 353
-115
 average prep time
 average-prep-time
 17
@@ -799,10 +880,10 @@ average-prep-time
 11
 
 MONITOR
-241
-182
-333
-227
+573
+255
+665
+300
 max prep time
 max-prep-time
 17
@@ -810,10 +891,10 @@ max-prep-time
 11
 
 MONITOR
-240
-126
-345
-171
+436
+360
+561
+405
 max waiting time
 max-waiting-time
 17
@@ -821,10 +902,10 @@ max-waiting-time
 11
 
 MONITOR
-239
-12
-367
-57
+436
+255
+561
+300
 average waiting time
 average-waiting-time
 17
@@ -832,10 +913,10 @@ average-waiting-time
 11
 
 MONITOR
-411
-113
-504
-158
+231
+130
+324
+175
 total surgeries
 total-surgeries
 17
@@ -859,7 +940,6 @@ false
 "" ""
 PENS
 "default" 1.0 0 -13840069 true "" "plot average-prep-time"
-"pen-1" 1.0 0 -5825686 true "" "plot max-prep-time"
 
 CHOOSER
 15
@@ -872,10 +952,10 @@ heuristic2
 0
 
 MONITOR
-533
-176
-627
-221
+353
+193
+447
+238
 total surgeons
 total-surgeons
 17
@@ -883,10 +963,10 @@ total-surgeons
 11
 
 MONITOR
-412
-176
-502
-221
+232
+193
+322
+238
 total hospitals
 total-hospitals
 17
@@ -894,15 +974,32 @@ total-hospitals
 11
 
 MONITOR
-531
-113
-657
-158
-total operating room
+351
+130
+469
+175
+Number of ORs
 total-or
 17
 1
 11
+
+BUTTON
+244
+89
+415
+122
+Show Allocation Results
+show-results
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
 
 @#$#@#$#@
 ## WHAT IS IT?
