@@ -395,6 +395,7 @@ to-report calculate-schedule [operating-room-schedule or-hospital-id s-duration 
 end
 
 ;; compute best schedule out of schedules received as arguments taking into consideration the used heuristic TODO
+
 ;; returns [day time-block prep-time]
 to-report compute-best-schedule [available-schedules]
   let best-schedule (list (item 0 (item 0 available-schedules)) (item 0 (item 2 (item 0 available-schedules))) (item 1 (item 0 available-schedules)))
@@ -648,6 +649,7 @@ to surgeon-navigate [coords]
   [set heading towards one-of patches with[ pxcor =  x and pycor = y ] fd 1]
 end
 
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; LOAD DATA ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; id,urgency,surgery-type,surgery-specialty
@@ -752,12 +754,44 @@ to create-surgeons-data
   ]
   file-close
 end
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; SAVE DATA ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; Save schedule in csv file per or
+to save-schedule
+  let i 0
+  let j 0
+  let fileName ""
+  foreach or-schedule [
+    foreach item i or-schedule [
+      ask surgeries with [ surgery-id = (item j item i) ] [
+        set fileName = final-hosp-id + j
+        csv:to-file "fileName.csv"[
+          ["---------- Surgery " surgery-id "-----------"]
+          ["urgency: " urgency]
+          ["surgery-type: " surgery-type]
+          ["surgery-specialty: " surgery-specialty]
+          ["assigned-surgeon: " assigned-surgeon]
+          ["final-hosp-id:" final-hosp-id]
+          ["assigned-day: " assigned-day]
+          ["start-time: " start-time]
+          ["end-time: " start-time + actual-duration]
+          ["prep-time: " prep-time]
+          ["actual-duration: " actual-duration]
+          [""]  ;; blank line
+        ]
+    ]
+      set j = j + 1
+    ]
+    set i = i + 1]
+end
 @#$#@#$#@
 GRAPHICS-WINDOW
 687
 16
-1157
-487
+1160
+490
 -1
 -1
 15.0
@@ -1343,7 +1377,7 @@ false
 Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 @#$#@#$#@
-NetLogo 6.0.4
+NetLogo 6.1.1
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
