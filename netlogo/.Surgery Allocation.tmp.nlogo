@@ -767,9 +767,9 @@ to save-schedule
     set j 0
     foreach item i or-schedule [
       ask surgeries with [ surgery-id = (item j item i or-schedule) ] [
-        set fileName final-hosp-id + j
+
         csv:to-file "fileName.csv"[
-          ["---------- Surgery "  "-----------"]
+          ["---------- Surgery " surgery-id "-----------"]
           ["urgency: " urgency]
           ["surgery-type: " surgery-type]
           ["surgery-specialty: " surgery-specialty]
