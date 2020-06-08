@@ -769,7 +769,7 @@ to save-schedule
       ask surgeries with [ surgery-id = (item j item i or-schedule) ] [
         set fileName final-hosp-id + j
         csv:to-file "fileName.csv"[
-          ["---------- Surgery " surgery-id "-----------"]
+          ["---------- Surgery "  "-----------"]
           ["urgency: " urgency]
           ["surgery-type: " surgery-type]
           ["surgery-specialty: " surgery-specialty]
