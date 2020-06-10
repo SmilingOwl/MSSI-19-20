@@ -85,15 +85,15 @@ to go
   foreach ordered-surgeries
   [
     first-surgery -> ask first-surgery [
-      print first-surgery
       allocate-operating-block
     ]
   ]
 
   ask patches with [or-hosp-id != 0]
   [
-    show or-schedule
+    ;show or-schedule
   ]
+  save-schedule
 end
 
 to show-results
@@ -399,6 +399,7 @@ end
 
 ;; returns [day time-block prep-time]
 to-report compute-best-schedule [available-schedules]
+  ;show available-schedules
   let best-schedule (list (item 0 (item 0 available-schedules)) (item 0 (item 2 (item 0 available-schedules))) (item 1 (item 0 available-schedules)))
   let index 0
   while [index < (length available-schedules)]
@@ -530,10 +531,11 @@ end
 ;; check available schedules for surgeon TODO -> what if there is no availability in the said schedules?
 to-report check-surgeon-availability [surg-schedule available-schedules surgery-duration] ;; available-schedules -> list of [day prep-time [[start-time end-time] ...]]
   let index 0
-  ;; show "check-surgeon-availability"
+  ;show "check-surgeon-availability"
+  ;show surg-schedule
   set surg-schedule (obtain-schedule surg-schedule)
-  ;; show (word "surgeon-schedule " surg-schedule)
-  ;; show (word "available-schedules " available-schedules)
+  ;show (word "surgeon-schedule " surg-schedule)
+  ;show (word "available-schedules " available-schedules)
   while [index < (length available-schedules)]
   [
     ;; show (word "index " index)
@@ -566,7 +568,9 @@ to-report check-surgeon-availability [surg-schedule available-schedules surgery-
               if (item 1 sds) < (item 1 das)
               [ set day-available-schedule (insert-item index-to-add day-available-schedule (list (item 1 sds) (item 1 das))) ]
 
+              ;show "day-available-schedule"
               set day-available-schedule (remove-item index-day-or day-available-schedule)
+              ;show day-available-schedule
             ]
             set index-day-s (index-day-s + 1)
           ]
@@ -574,7 +578,8 @@ to-report check-surgeon-availability [surg-schedule available-schedules surgery-
         ]
       ]
     ]
-    ;; show (word "day available schedule after " day-available-schedule)
+    let replacement (replace-item 2 (item index available-schedules) day-available-schedule)
+    set available-schedules (replace-item index available-schedules replacement)
     set index (index + 1)
   ]
 
@@ -584,8 +589,7 @@ to-report check-surgeon-availability [surg-schedule available-schedules surgery-
   [
     let day-available-schedule (item 2 (item index available-schedules))
     let day-prep-time (item 1 (item index available-schedules))
-    ifelse empty? day-available-schedule
-    [ set available-schedules (remove-item index available-schedules) ]
+    if not empty? day-available-schedule
     [
       let index-day 0
       while [index-day < (length day-available-schedule)]
@@ -597,8 +601,13 @@ to-report check-surgeon-availability [surg-schedule available-schedules surgery-
         ]
         [set index-day (index-day + 1)]
       ]
-      set index (index + 1)
     ]
+    if empty? day-available-schedule
+    [
+      set available-schedules (remove-item index available-schedules)
+      set index (index - 1)
+    ]
+    set index (index + 1)
   ]
   report available-schedules
 end
@@ -761,33 +770,44 @@ end
 
 ;; Save schedule in csv file per or
 to save-schedule
-  let i 0 ;; each sub list
+  let schedules []
+  ask patches with [or-hosp-id != 0] [
+    set schedules (lput (list or-hosp-id or-schedule) schedules)
+  ]
+  let i 0
+  foreach schedules [
+    schedule -> print-schedule schedule i
+    set i (i + 1)
+  ]
+end
+
+to print-schedule [schedule n]
   let j 0
-  let fileName ""
-  foreach or-schedule [
-    set j 0
-    foreach item i or-schedule [
-      set fileName final-hosp-id + j
-      ask surgeries with [ surgery-id = (item j item i or-schedule) ] [
-        csv:to-file "fileName.csv" (list
-          (list "---------- Surgery " surgery-id "-----------")
-          (list "urgency: " urgency)
-          (list "surgery-type: " surgery-type)
-          (list "surgery-specialty: " surgery-specialty)
-          (list "assigned-surgeon: " assigned-surgeon)
-          (list "final-hosp-id:" final-hosp-id)
-          (list "assigned-day: " assigned-day)
-          (list "start-time: " start-time)
-          (list "end-time: " (start-time + prep-time + actual-duration))
-          (list "prep-time: " prep-time)
-          (list "actual-duration: " actual-duration)
-          (list "")  ;; blank line
-        )
-    ]
+  let i 0
+  let filename (word "data/or-" n "_hosp-" (item 0 schedule) ".csv")
+  let info []
+  while [i < (length (item 1 schedule))] [ ;;for each day
+    while [j < (length (item i (item 1 schedule)))] [ ;;for each surgery
+      ask surgeries with [ surgery-id = (item j (item i (item 1 schedule))) ] [
+        set info (lput (list "---------- Surgery " surgery-id "-----------") info)
+        set info (lput (list "urgency: " urgency) info)
+        set info (lput (list "surgery-type: " surgery-type) info)
+        set info (lput (list "surgery-specialty: " surgery-specialty) info)
+        set info (lput (list "assigned-surgeon: " assigned-surgeon) info)
+        set info (lput (list "final-hosp-id:" final-hosp-id) info)
+        set info (lput (list "assigned-day: " assigned-day) info)
+        set info (lput (list "start-time: " start-time) info)
+        set info (lput (list "end-time: " (start-time + prep-time + actual-duration)) info)
+        set info (lput (list "prep-time: " prep-time) info)
+        set info (lput (list "actual-duration: " actual-duration) info)
+        set info (lput (list "") info)
+      ]
       set j (j + 1)
     ]
     set i (i + 1)
+    set j 0
   ]
+  csv:to-file filename info
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -881,7 +901,7 @@ operating-hours
 operating-hours
 4
 24
-0.0
+10.0
 1
 1
 NIL
