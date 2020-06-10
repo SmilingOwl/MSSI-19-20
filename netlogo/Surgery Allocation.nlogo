@@ -108,7 +108,7 @@ to show-results
   while [day <= max [assigned-day] of surgeries]
   [
     set time  0
-    while [time < 60 * operating-hours]
+    while [time <= 60 * operating-hours]
     [
       ask surgeries with [assigned-day = day and start-time = time]
       [
@@ -900,7 +900,7 @@ SLIDER
 operating-hours
 operating-hours
 4
-24
+16
 10.0
 1
 1

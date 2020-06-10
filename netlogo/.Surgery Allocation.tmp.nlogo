@@ -108,10 +108,12 @@ to show-results
   while [day <= max [assigned-day] of surgeries]
   [
     set time  0
-    while [time < 60 * operating-hours]
+    while [time <= 60 * operating-hours]
     [
       ask surgeries with [assigned-day = day and start-time = time]
       [
+        if urgency = 1
+        [show (word "surgery: " surgery-id " in")]
         update-global-variables assigned-day prep-time
         facexy (item 0 assigned-or-coords) (item 1 assigned-or-coords)
         set state "move"
@@ -128,6 +130,8 @@ to show-results
       ]
       ask surgeries with [assigned-day = day and start-time + prep-time + actual-duration = time]
       [
+        if urgency = 1
+        [show (word "surgery: " surgery-id " out")]
         set state "hide"
         let selected-surgeon assigned-surgeon
         ask surgeons with [surgeon-id = selected-surgeon]
@@ -901,7 +905,7 @@ operating-hours
 operating-hours
 4
 16
-24.0
+10.0
 1
 1
 NIL
