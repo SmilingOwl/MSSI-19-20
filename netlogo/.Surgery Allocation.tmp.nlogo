@@ -85,6 +85,7 @@ to go
   foreach ordered-surgeries
   [
     first-surgery -> ask first-surgery [
+      print first-surgery
       allocate-operating-block
     ]
   ]
@@ -766,22 +767,22 @@ to save-schedule
   foreach or-schedule [
     set j 0
     foreach item i or-schedule [
+      set fileName final-hosp-id + j
       ask surgeries with [ surgery-id = (item j item i or-schedule) ] [
-
-        csv:to-file "fileName.csv"[
-          ["---------- Surgery " surgery-id "-----------"]
-          ["urgency: " urgency]
-          ["surgery-type: " surgery-type]
-          ["surgery-specialty: " surgery-specialty]
-          ["assigned-surgeon: " assigned-surgeon]
-          ["final-hosp-id:" final-hosp-id]
-          ["assigned-day: " assigned-day]
-          ["start-time: " start-time]
-          ["end-time: " start-time + actual-duration]
-          ["prep-time: " prep-time]
-          ["actual-duration: " actual-duration]
-          [""]  ;; blank line
-        ]
+        csv:to-file "fileName.csv" (list
+          (list "---------- Surgery " surgery-id "-----------")
+          (list "urgency: " urgency)
+          (list "surgery-type: " surgery-type)
+          (list "surgery-specialty: " surgery-specialty)
+          (list "assigned-surgeon: " assigned-surgeon)
+          (list "final-hosp-id:" final-hosp-id)
+          (list "assigned-day: " assigned-day)
+          (list "start-time: " start-time)
+          (list "end-time: " (start-time + prep-time + actual-duration))
+          (list "prep-time: " prep-time)
+          (list "actual-duration: " actual-duration)
+          (list "")  ;; blank line
+        )
     ]
       set j (j + 1)
     ]
@@ -866,7 +867,7 @@ INPUTBOX
 193
 188
 data-folder
-data\\simple_example
+data/simple_example
 1
 0
 String
@@ -880,7 +881,7 @@ operating-hours
 operating-hours
 4
 24
-10.0
+0.0
 1
 1
 NIL
@@ -1012,7 +1013,7 @@ total-hospitals
 MONITOR
 351
 130
-469
+447
 175
 Number of ORs
 total-or
@@ -1379,7 +1380,7 @@ false
 Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 @#$#@#$#@
-NetLogo 6.1.1
+NetLogo 6.0.4
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
