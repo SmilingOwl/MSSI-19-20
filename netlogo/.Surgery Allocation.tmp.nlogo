@@ -766,8 +766,8 @@ to save-schedule
   foreach or-schedule [
     set j 0
     foreach item i or-schedule [
-      set fileName final-hosp-id + j
       ask surgeries with [ surgery-id = (item j item i or-schedule) ] [
+
         csv:to-file "fileName.csv"[
           ["---------- Surgery " surgery-id "-----------"]
           ["urgency: " urgency]
@@ -1012,7 +1012,7 @@ total-hospitals
 MONITOR
 351
 130
-447
+469
 175
 Number of ORs
 total-or
