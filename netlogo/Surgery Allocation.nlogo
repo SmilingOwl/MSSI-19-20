@@ -89,11 +89,6 @@ to go
       allocate-operating-block
     ]
   ]
-
-  ask patches with [or-hosp-id != 0]
-  [
-    ;show or-schedule
-  ]
   save-schedule
 end
 
@@ -324,18 +319,13 @@ end
 
 ;; operating rooms procedure to insert surgery in its schedule
 to insert-surgery [s-day s-start-time s-duration s-prep-time s-surgery]
-  ifelse (length or-schedule) <= s-day
+  while [(length or-schedule) <= s-day]
   [
     set or-schedule (insert-item (length or-schedule) or-schedule [])
-    let or-schedule-day (item s-day or-schedule)
-    set or-schedule-day (insert-item (length or-schedule-day) or-schedule-day s-surgery)
-    set or-schedule (replace-item s-day or-schedule or-schedule-day)
   ]
-  [
-    let or-schedule-day (item s-day or-schedule)
-    set or-schedule-day (insert-item (length or-schedule-day) or-schedule-day s-surgery)
-    set or-schedule (replace-item s-day or-schedule or-schedule-day)
-  ]
+  let or-schedule-day (item s-day or-schedule)
+  set or-schedule-day (insert-item (length or-schedule-day) or-schedule-day s-surgery)
+  set or-schedule (replace-item s-day or-schedule or-schedule-day)
 end
 
 ;; operating room procedure to calculate surgery prep time TODO
@@ -364,6 +354,11 @@ end
 ;; operating rooms procedure to calculate and return the best schedule for surgery. return [day start-time prep-time]
 to-report calculate-schedule [operating-room-schedule or-hospital-id s-duration s-type s-specialty s-hosp-id s-surgeon]
   ;; TODO add transference cost
+  let surgeon-last-day 0
+  ask surgeons with [surgeon-id = s-surgeon]
+  [
+    set surgeon-last-day get-last-day
+  ]
   let available-schedules [] ;; list of lists [[day prep-time [start-time end-time]]]
   ifelse empty? operating-room-schedule
   [
@@ -372,12 +367,12 @@ to-report calculate-schedule [operating-room-schedule or-hospital-id s-duration 
   ]
   [
     let index 0
-    while [index <= (length operating-room-schedule)]
+    while [index <= (length operating-room-schedule) or index <= surgeon-last-day]
     [
-      ifelse index = (length operating-room-schedule) ;; the whole last day is available
+      ifelse index >= (length operating-room-schedule) ;; the whole last day is available
       [
         let s-prep-time (calculate-prep-time s-type s-specialty [])
-        set available-schedules (lput (list (length operating-room-schedule) s-prep-time (list (list 0 (operating-hours * 60)))) available-schedules)
+        set available-schedules (lput (list index s-prep-time (list (list 0 (operating-hours * 60)))) available-schedules)
       ]
       [
         let schedule-day (item index operating-room-schedule)
@@ -397,7 +392,6 @@ to-report calculate-schedule [operating-room-schedule or-hospital-id s-duration 
 end
 
 ;; compute best schedule out of schedules received as arguments taking into consideration the used heuristic TODO
-
 ;; returns [day time-block prep-time]
 to-report compute-best-schedule [available-schedules]
   let best-schedule (list (item 0 (item 0 available-schedules)) (item 0 (item 2 (item 0 available-schedules))) (item 1 (item 0 available-schedules)))
@@ -528,6 +522,10 @@ to-report get-occupied-time
   report (list surgeon-id surgeon-hosp-id occupied-time surgeon-expertise)
 end
 
+to-report get-last-day
+  report length surgeon-schedule
+end
+
 ;; check available schedules for surgeon TODO -> what if there is no availability in the said schedules?
 to-report check-surgeon-availability [surg-schedule available-schedules surgery-duration] ;; available-schedules -> list of [day prep-time [[start-time end-time] ...]]
   let index 0
@@ -546,7 +544,7 @@ to-report check-surgeon-availability [surg-schedule available-schedules surgery-
         [
           let das (item index-day-or day-available-schedule)
           let index-day-s 0
-          while [index-day-s < (length surg-day-schedule)]
+          while [index-day-s < (length surg-day-schedule) and das != [] ]
           [
             let sds (item index-day-s surg-day-schedule)
             if (item 1 sds) > (item 0 das) and (item 0 sds) < (item 1 das)
@@ -562,6 +560,9 @@ to-report check-surgeon-availability [surg-schedule available-schedules surgery-
               [ set day-available-schedule (insert-item index-to-add day-available-schedule (list (item 1 sds) (item 1 das))) ]
 
               set day-available-schedule (remove-item index-day-or day-available-schedule)
+              ifelse (length day-available-schedule) < index-day-or
+              [ set das (item index-day-or day-available-schedule) ]
+              [ set das [] ]
             ]
             set index-day-s (index-day-s + 1)
           ]
@@ -790,7 +791,7 @@ end
 to print-schedule [schedule n]
   let j 0
   let i 0
-  let filename (word "data/or-" n "_hosp-" (item 0 schedule) ".csv")
+  let filename (word "data/results/or-" n "_hosp-" (item 0 schedule) ".csv")
   let info []
   while [i < (length (item 1 schedule))] [ ;;for each day
     while [j < (length (item i (item 1 schedule)))] [ ;;for each surgery
@@ -868,7 +869,7 @@ CHOOSER
 heuristic
 heuristic
 "minimize-prep-time" "minimize-waiting-time"
-0
+1
 
 BUTTON
 244
@@ -1007,11 +1008,11 @@ PENS
 CHOOSER
 15
 71
-153
+195
 116
-heuristic2
-heuristic2
-"across hospitals" "same hospital"
+hospital-transfer
+hospital-transfer
+"none" "waiting time" "surgeon occupancy"
 0
 
 MONITOR
