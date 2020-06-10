@@ -133,7 +133,7 @@ to show-results
         let selected-surgeon assigned-surgeon
         ask surgeons with [surgeon-id = selected-surgeon]
         [
-          set move-coords
+          set move-coords surgeon-init-pos
           set surgeon-state "move"
         ]
       ]
@@ -172,7 +172,7 @@ to move
     [
       set patch-coords (list pxcor pycor)
     ]
-    if (item 0 patch-coords) = (item 0 move-coords) and (item 1 patch-coords) = (item 1 move-coords)
+    if (item 0 patch-coords) = (item 0 move-coords) and (item 1 patch-coords) = (item 1 move-coords) or (item 0 move-coords) = (item 0 surgeon-init-pos) and (item 0 patch-coords) = (item 0 move-coords)
     [
       set surgeon-state "operating"
     ]
@@ -400,7 +400,6 @@ end
 
 ;; returns [day time-block prep-time]
 to-report compute-best-schedule [available-schedules]
-  ;show available-schedules
   let best-schedule (list (item 0 (item 0 available-schedules)) (item 0 (item 2 (item 0 available-schedules))) (item 1 (item 0 available-schedules)))
   let index 0
   while [index < (length available-schedules)]
@@ -532,18 +531,11 @@ end
 ;; check available schedules for surgeon TODO -> what if there is no availability in the said schedules?
 to-report check-surgeon-availability [surg-schedule available-schedules surgery-duration] ;; available-schedules -> list of [day prep-time [[start-time end-time] ...]]
   let index 0
-  ;show "check-surgeon-availability"
-  ;show surg-schedule
   set surg-schedule (obtain-schedule surg-schedule)
-  ;show (word "surgeon-schedule " surg-schedule)
-  ;show (word "available-schedules " available-schedules)
   while [index < (length available-schedules)]
   [
-    ;; show (word "index " index)
     let day-available-schedule (item 2 (item index available-schedules))
     let day (item 0 (item index available-schedules))
-    ;; show (word "day of available schedule " day)
-    ;; show (word "day available schedule " day-available-schedule)
     if day < (length surg-schedule) ;; if surgeon has surgeries scheduled in this day or days after
     [
       if not empty? (item day surg-schedule) ;; if surgeon has surgeries scheduled in this day -> compute times where both the OR and the surgeon are available
@@ -569,9 +561,7 @@ to-report check-surgeon-availability [surg-schedule available-schedules surgery-
               if (item 1 sds) < (item 1 das)
               [ set day-available-schedule (insert-item index-to-add day-available-schedule (list (item 1 sds) (item 1 das))) ]
 
-              ;show "day-available-schedule"
               set day-available-schedule (remove-item index-day-or day-available-schedule)
-              ;show day-available-schedule
             ]
             set index-day-s (index-day-s + 1)
           ]
@@ -615,7 +605,6 @@ end
 
 ;; translate surgery ids to time blocks
 to-report obtain-schedule [s-schedule]
-  ;; show (word "obtain-schedule " s-schedule)
   let time-block-schedule []
   let index 0
   while [index < (length s-schedule)]
@@ -636,7 +625,6 @@ to-report obtain-schedule [s-schedule]
     set time-block-schedule (lput day-schedule time-block-schedule)
     set index (index + 1)
   ]
-  ;; show (word "obtain-schedule results: " time-block-schedule)
   report time-block-schedule
 end
 
