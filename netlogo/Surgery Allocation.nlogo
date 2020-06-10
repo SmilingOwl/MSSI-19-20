@@ -756,8 +756,8 @@ end
 GRAPHICS-WINDOW
 687
 16
-1157
-487
+1160
+490
 -1
 -1
 15.0
@@ -976,7 +976,7 @@ total-hospitals
 MONITOR
 351
 130
-469
+447
 175
 Number of ORs
 total-or
