@@ -55,6 +55,7 @@ surgeons-own [
   surgeon-schedule                 ;; bidimensional list: each row represents a day; each column represents a surgery
   occupied-time
   surgeon-state
+  surgeon-init-pos
   move-coords
 ]
 
@@ -112,8 +113,6 @@ to show-results
     [
       ask surgeries with [assigned-day = day and start-time = time]
       [
-        if urgency = 1
-        [show (word "surgery: " surgery-id " in")]
         update-global-variables assigned-day prep-time
         facexy (item 0 assigned-or-coords) (item 1 assigned-or-coords)
         set state "move"
@@ -130,13 +129,11 @@ to show-results
       ]
       ask surgeries with [assigned-day = day and start-time + prep-time + actual-duration = time]
       [
-        if urgency = 1
-        [show (word "surgery: " surgery-id " out")]
         set state "hide"
         let selected-surgeon assigned-surgeon
         ask surgeons with [surgeon-id = selected-surgeon]
         [
-          set move-coords (list 13 (15 - surgeon-hosp-id * 3))
+          set move-coords
           set surgeon-state "move"
         ]
       ]
@@ -680,8 +677,16 @@ to create-surgeries-data
       set surgery-type item 2 data
       set surgery-specialty item 3 data
       set hosp-id item 4 data
-      set xcor -13
-      set ycor (15 - hosp-id * 3)
+      let random-x 0
+      let random-y 0
+      ifelse random 1 = 1
+      [set random-x (random-float 1)]
+      [set random-x (random-float -1)]
+      ifelse random 1 = 1
+      [set random-y (random-float 1)]
+      [set random-y (random-float -1)]
+      set xcor -13 + random-x
+      set ycor (15 - hosp-id * 3 + random-y)
       ifelse urgency = 1
       [set color green]
       [
@@ -745,8 +750,17 @@ to create-surgeons-data
       set surgeon-hosp-id item 2 data
       set surgeon-schedule []
       set occupied-time 0
-      set xcor 13
-      set ycor (15 - surgeon-hosp-id * 3)
+      let random-x 0
+      let random-y 0
+      ifelse random 1 = 1
+      [set random-x (random-float 1)]
+      [set random-x (random-float -1)]
+      ifelse random 1 = 1
+      [set random-y (random-float 1)]
+      [set random-y (random-float -1)]
+      set surgeon-init-pos (list (13 + random-x) (15 - surgeon-hosp-id * 3 + random-y))
+      set xcor 13 + random-x
+      set ycor (15 - surgeon-hosp-id * 3 + random-y)
       let expertise item 3 data
       ifelse expertise = 1
       [
