@@ -900,8 +900,8 @@ SLIDER
 operating-hours
 operating-hours
 4
-24
-10.0
+16
+24.0
 1
 1
 NIL
