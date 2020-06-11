@@ -12,6 +12,10 @@ globals
   total-prep-time
   max-prep-time
   average-prep-time
+  number-transfer
+  average-transfer-cost
+  max-transfer-cost
+  total-transfer-cost
 ]
 
 ;; agents
@@ -34,12 +38,15 @@ surgeries-own [
   hosp-id                          ;; initial hospital in which the patient was signed up for surgery
   final-hosp-id                    ;; assigned hospital after allocation
   actual-duration                  ;; int with actual duration of the surgery, in minutes
+  surgery-transfer-cost
   state
 ]
 
 hospitals-own [
   hospital-id
   hospital-type                    ;; public or private
+  hospital-x
+  hospital-y
 ]
 
 patches-own [
@@ -80,6 +87,10 @@ to setup
   set total-hospitals count hospitals
   set total-surgeons count surgeons
   set total-or count patches with [pcolor != black]
+  set number-transfer 0
+  set average-transfer-cost 0
+  set max-transfer-cost 0
+  set total-transfer-cost 0
 end
 
 to go
@@ -108,7 +119,7 @@ to show-results
     [
       ask surgeries with [assigned-day = day and start-time = time]
       [
-        update-global-variables assigned-day prep-time
+        update-global-variables assigned-day prep-time surgery-transfer-cost
         facexy (item 0 assigned-or-coords) (item 1 assigned-or-coords)
         set state "move"
       ]
@@ -212,11 +223,21 @@ to-report calculate-duration [s-type expertise]
   report s-duration
 end
 
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; SURGERY FUNCTIONS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 ;; allocation of surgeons and ors
 to allocate-operating-block
+  let transfer-cost 0
+  ;; check if surgery should be transferred
+  ifelse hospital-transfer = "none"
+  [ set final-hosp-id hosp-id ]
+  [
+    let result-hosp (get-hospital-for-surgery hosp-id surgery-specialty)
+    set final-hosp-id (item 0 result-hosp)
+    set transfer-cost (item 1 result-hosp)
+    show "hello"
+    show result-hosp
+    show hosp-id
+  ]
+
   ;; get surgeon who would perform the surgery in each hospital
   set surgeon-per-hospital (get-surgeon-per-hospital surgery-specialty) ;[hospital-id surgeon-id surgeon-expertise]
 
@@ -229,7 +250,7 @@ to allocate-operating-block
   ;; get operating rooms schedule
   let ors-list patches with [or-hosp-id != 0] ;; obtain all operating rooms
   let available-schedules []
-  let s-hosp-id hosp-id
+  let s-hosp-id final-hosp-id
   if heuristic = "minimize-prep-time" or heuristic = "minimize-waiting-time"
   [
     set ors-list patches with [or-hosp-id = s-hosp-id] ;; obtain operating rooms of surgery's hospital
@@ -244,7 +265,7 @@ to allocate-operating-block
   [
     op-room ->
     let best-or-schedule (calculate-schedule
-      (item 0 op-room) (item 1 op-room) (get-duration-hospital duration (item 1 op-room)) surgery-type surgery-specialty hosp-id (get-surgeon-hospital surgeon-per-hospital (item 1 op-room)))
+      (item 0 op-room) (item 1 op-room) (get-duration-hospital duration (item 1 op-room)) surgery-type surgery-specialty final-hosp-id (get-surgeon-hospital surgeon-per-hospital (item 1 op-room)))
     ;; best-or-schedule -> [pxcor pycor day time-block prep-time]
     set best-or-schedule (list (item 2 op-room) (item 3 op-room) (item 0 best-or-schedule) (item 1 best-or-schedule) (item 2 best-or-schedule))
     set available-schedules (lput best-or-schedule available-schedules)
@@ -264,7 +285,7 @@ to allocate-operating-block
   set prep-time (item 4 best-schedule)
   set start-time (item 0 (item 3 best-schedule))
   set assigned-day (item 2 best-schedule)
-  set final-hosp-id assigned-or-hosp-id
+  set surgery-transfer-cost transfer-cost
   let a-surgeon assigned-surgeon
   let a-duration actual-duration
   let assigned-surgeon-or-coords assigned-or-coords
@@ -274,7 +295,7 @@ to allocate-operating-block
   ]
 end
 
-to update-global-variables [waiting-time s-prep-time]
+to update-global-variables [waiting-time s-prep-time s-transfer-cost]
   set total-surgeries (total-surgeries + 1)
   set total-waiting-time (total-waiting-time + waiting-time)
   set max-waiting-time (max (list max-waiting-time waiting-time))
@@ -282,6 +303,87 @@ to update-global-variables [waiting-time s-prep-time]
   set max-prep-time (max (list max-prep-time prep-time))
   set average-waiting-time (total-waiting-time / total-surgeries)
   set average-prep-time (total-prep-time / total-surgeries)
+  if s-transfer-cost > 0
+  [
+    set max-transfer-cost (max (list s-transfer-cost max-transfer-cost))
+    set total-transfer-cost (total-transfer-cost + s-transfer-cost)
+    set number-transfer (number-transfer + 1)
+    set average-transfer-cost (total-transfer-cost / total-hospitals)
+  ]
+end
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; SURGERY FUNCTIONS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+to-report get-hospital-for-surgery [original-hospital specialty]
+  let hosp-info []
+  let original-hosp-info []
+  ask hospitals [
+    let metric 0
+    if hospital-transfer = "surgeon occupancy"
+    [
+      set metric (get-total-occupied-time specialty)
+    ]
+    if hospital-transfer = "waiting time"
+    [
+      set metric get-min-last-day-or
+    ]
+    if hospital-transfer = "number surgeries"
+    [
+      set metric get-total-surgeries
+    ]
+    set hosp-info (lput (list hospital-id metric (calculate-transfer-cost original-hospital hospital-id)) hosp-info)
+    if hospital-id = original-hospital
+    [ set original-hosp-info (list hospital-id metric (calculate-transfer-cost original-hospital hospital-id))]
+  ]
+  let total-metric 0
+  let i 0
+  while [i < (length hosp-info)] [
+    set total-metric (total-metric + (item 1 (item i hosp-info)))
+    set i (i + 1)
+  ]
+  let avg-metric (total-metric / (length hosp-info))
+  ifelse (item 1 original-hosp-info) >= 2 * avg-metric
+  [
+    let best-hospital (item 0 hosp-info)
+    set i 0
+    while [i < (length hosp-info)]
+    [
+      if (item 1 (item i hosp-info)) < avg-metric and (item 2 (item i hosp-info)) < (item 2 best-hospital)
+      [ set best-hospital (item i hosp-info) ]
+      set i (i + 1)
+    ]
+    report (list (item 0 best-hospital) (item 2 best-hospital))
+  ]
+  [ report (list original-hospital 0)]
+end
+
+to-report calculate-transfer-cost [ori-hosp dest-hosp]
+  ifelse ori-hosp = dest-hosp
+  [ report 0 ]
+  [
+    let x1 0
+    let y1 0
+    let x2 0
+    let y2 0
+    let dest-coords (list 0 0)
+    let private? false
+    ask hospitals with [hospital-id = ori-hosp]
+    [
+      set x1 hospital-x
+      set y1 hospital-y
+    ]
+    ask hospitals with [hospital-id = dest-hosp]
+    [
+      set x2 hospital-x
+      set y2 hospital-y
+      if hospital-type = "private"
+      [ set private? true ]
+    ]
+    let transfer-cost sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2))
+    if private? = true
+    [ set transfer-cost (transfer-cost + 10) ]
+    report transfer-cost
+  ]
 end
 
 to-report get-best-schedule-surgery [available-schedules]
@@ -303,17 +405,6 @@ to-report get-best-schedule-surgery [available-schedules]
   ]
   report best-schedule
 end
-
-to surgery-navigate
-   let x item 0 assigned-or-coords
-   let y item 1 assigned-or-coords
-
-  ask surgeries [
-    If any? Patches with[  pxcor = x and pycor = y ]
-    [set heading towards one-of patches with[ pxcor =  x and pycor = y ] fd 1]
-  ]
-end
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; OPERATING ROOM FUNCTIONS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -355,32 +446,26 @@ end
 to-report calculate-schedule [operating-room-schedule or-hospital-id s-duration s-type s-specialty s-hosp-id s-surgeon]
   ;; TODO add transference cost
   let surgeon-last-day 0
+
   ask surgeons with [surgeon-id = s-surgeon]
   [
     set surgeon-last-day get-last-day
   ]
   let available-schedules [] ;; list of lists [[day prep-time [start-time end-time]]]
-  ifelse empty? operating-room-schedule
+  let index 0
+  while [index <= (length operating-room-schedule) or index <= surgeon-last-day]
   [
-    let s-prep-time (calculate-prep-time s-type s-specialty [])
-    set available-schedules (insert-item 0 available-schedules (list 0 s-prep-time (list (list 0 (operating-hours * 60))))) ;; if schedule is empty, the whole first day is available
-  ]
-  [
-    let index 0
-    while [index <= (length operating-room-schedule) or index <= surgeon-last-day]
+    ifelse index >= (length operating-room-schedule) ;; the whole last day is available
     [
-      ifelse index >= (length operating-room-schedule) ;; the whole last day is available
-      [
-        let s-prep-time (calculate-prep-time s-type s-specialty [])
-        set available-schedules (lput (list index s-prep-time (list (list 0 (operating-hours * 60)))) available-schedules)
-      ]
-      [
-        let schedule-day (item index operating-room-schedule)
-        let s-prep-time (calculate-prep-time s-type s-specialty schedule-day)
-        set available-schedules (lput (list index s-prep-time (get-day-free-time schedule-day or-hospital-id (s-duration + s-prep-time))) available-schedules)
-      ]
-      set index (index + 1)
+      let s-prep-time (calculate-prep-time s-type s-specialty [])
+      set available-schedules (lput (list index s-prep-time (list (list 0 (operating-hours * 60)))) available-schedules)
     ]
+    [
+      let schedule-day (item index operating-room-schedule)
+      let s-prep-time (calculate-prep-time s-type s-specialty schedule-day)
+      set available-schedules (lput (list index s-prep-time (get-day-free-time schedule-day or-hospital-id (s-duration + s-prep-time))) available-schedules)
+    ]
+    set index (index + 1)
   ]
   let surg-schedule []
   ask surgeons with [surgeon-id = s-surgeon]
@@ -514,6 +599,54 @@ to-report get-surgeon [s-hosp-id specialty]
   report (list s-hosp-id best-surgeon expertise)
 end
 
+to-report get-min-last-day-surgeon [specialty]
+  let min-last-day -1
+  ask surgeons with [surgeon-hosp-id = hospital-id and surgeon-specialty = specialty] [
+    let last-day get-last-day
+    ifelse min-last-day = -1
+    [ set min-last-day last-day ]
+    [ set min-last-day (min (list min-last-day last-day))]
+  ]
+  if min-last-day = -1
+  [ set min-last-day 0 ]
+  report min-last-day
+end
+
+to-report get-min-last-day-or
+  let min-last-day -1
+  let hospit-id hospital-id
+  ask patches with [or-hosp-id = hospit-id] [
+    let last-day (length or-schedule)
+    ifelse min-last-day = -1
+    [ set min-last-day last-day ]
+    [ set min-last-day (min (list min-last-day last-day))]
+  ]
+  if min-last-day = -1
+  [ set min-last-day 0 ]
+  report min-last-day
+end
+
+to-report get-total-surgeries
+  let total 0
+  ask surgeries with [hospital-id = hosp-id]
+  [
+    if final-hosp-id = 0
+    [ set total (total + 1) ]
+  ]
+  ask surgeries with [hospital-id = final-hosp-id]
+  [
+    set total (total + 1)
+  ]
+  report total
+end
+
+to-report get-total-occupied-time [specialty]
+  let s-occupied-time 0
+  ask surgeons with [surgeon-hosp-id = hospital-id and surgeon-specialty = specialty] [
+    set s-occupied-time (s-occupied-time + occupied-time)
+  ]
+  report s-occupied-time
+end
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; SURGEON FUNCTIONS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -641,15 +774,6 @@ to insert-surgery-surgeon [s-day s-duration s-surgery]
   set occupied-time (occupied-time + s-duration)
 end
 
-to surgeon-navigate [coords]
-  let x item 0 coords
-  let y item 1 coords
-
-  if any? patches with[  pxcor = x and pycor = y ]
-  [set heading towards one-of patches with[ pxcor =  x and pycor = y ] fd 1]
-end
-
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; LOAD DATA ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; id,urgency,surgery-type,surgery-specialty
@@ -675,7 +799,7 @@ to create-surgeries-data
       [set random-y (random-float 1)]
       [set random-y (random-float -1)]
       set xcor -13 + random-x
-      set ycor (15 - hosp-id * 3 + random-y)
+      set ycor (16 - hosp-id * 4 + random-y)
       ifelse urgency = 1
       [set color green]
       [
@@ -691,11 +815,8 @@ end
 ;; id,type,small or number,medium or number,big or number
 to create-hospitals-data
   file-open (word data-folder "/hospitals.csv")
-  let or-big 0
-  let or-medium 0
-  let or-small 0
-  let last-or 0
   random-seed 11
+  let last-or 0
   let or-number 0
   while [ not file-at-end? ] [
     let data csv:from-row file-read-line
@@ -707,6 +828,8 @@ to create-hospitals-data
       set hospital-id item 0 data
       set hospital-type item 1 data
       set or-number item 2 data
+      set hospital-x item 3 data
+      set hospital-y item 4 data
     ]
     let i 0
     while [i < or-number]
@@ -747,9 +870,9 @@ to create-surgeons-data
       ifelse random 1 = 1
       [set random-y (random-float 1)]
       [set random-y (random-float -1)]
-      set surgeon-init-pos (list (13 + random-x) (15 - surgeon-hosp-id * 3 + random-y))
+      set surgeon-init-pos (list (13 + random-x) (16 - surgeon-hosp-id * 4 + random-y))
       set xcor 13 + random-x
-      set ycor (15 - surgeon-hosp-id * 3 + random-y)
+      set ycor (16 - surgeon-hosp-id * 4 + random-y)
       let expertise item 3 data
       ifelse expertise = 1
       [
@@ -775,7 +898,7 @@ end
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; SAVE DATA ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; Save schedule in csv file per or
+;; Save schedule in csv file
 to save-schedule
   let schedules []
   ask patches with [or-hosp-id != 0] [
@@ -869,7 +992,7 @@ CHOOSER
 heuristic
 heuristic
 "minimize-prep-time" "minimize-waiting-time"
-1
+0
 
 BUTTON
 244
@@ -894,7 +1017,7 @@ INPUTBOX
 193
 188
 data-folder
-data/simple_example
+data/two_hospitals
 1
 0
 String
@@ -908,7 +1031,7 @@ operating-hours
 operating-hours
 8
 16
-8.0
+12.0
 1
 1
 NIL
@@ -939,7 +1062,7 @@ MONITOR
 353
 average prep time
 average-prep-time
-17
+2
 1
 11
 
@@ -950,7 +1073,7 @@ MONITOR
 300
 max prep time
 max-prep-time
-17
+2
 1
 11
 
@@ -961,7 +1084,7 @@ MONITOR
 405
 max waiting time
 max-waiting-time
-17
+2
 1
 11
 
@@ -972,7 +1095,7 @@ MONITOR
 300
 average waiting time
 average-waiting-time
-17
+2
 1
 11
 
@@ -1013,7 +1136,7 @@ CHOOSER
 hospital-transfer
 hospital-transfer
 "none" "waiting time" "surgeon occupancy"
-0
+1
 
 MONITOR
 353
@@ -1064,6 +1187,17 @@ NIL
 NIL
 NIL
 1
+
+MONITOR
+573
+312
+685
+357
+Number Transfers
+number-transfer
+2
+1
+11
 
 @#$#@#$#@
 ## WHAT IS IT?
