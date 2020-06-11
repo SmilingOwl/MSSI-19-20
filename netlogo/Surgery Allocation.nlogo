@@ -323,7 +323,7 @@ to-report get-hospital-for-surgery [original-hospital specialty]
     ]
     if hospital-transfer = "waiting time"
     [
-      set metric get-min-last-day-or
+      set metric (max (list get-min-last-day-or get-min-last-day-surgeon specialty))
     ]
     if hospital-transfer = "number surgeries"
     [
@@ -609,7 +609,8 @@ end
 
 to-report get-min-last-day-surgeon [specialty]
   let min-last-day -1
-  ask surgeons with [surgeon-hosp-id = hospital-id and surgeon-specialty = specialty] [
+  let hospit-id hospital-id
+  ask surgeons with [surgeon-hosp-id = hospit-id and surgeon-specialty = specialty] [
     let last-day get-last-day
     ifelse min-last-day = -1
     [ set min-last-day last-day ]

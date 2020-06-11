@@ -323,7 +323,7 @@ to-report get-hospital-for-surgery [original-hospital specialty]
     ]
     if hospital-transfer = "waiting time"
     [
-      set metric get-min-last-day-or
+      set metric mget-min-last-day-or
     ]
     if hospital-transfer = "number surgeries"
     [
