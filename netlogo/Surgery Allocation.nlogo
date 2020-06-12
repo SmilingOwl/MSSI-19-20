@@ -57,6 +57,7 @@ hospitals-own [
 patches-own [
   or-schedule
   or-hosp-id
+  or-occupied-time
 ]
 
 surgeons-own [
@@ -246,17 +247,10 @@ to allocate-operating-block
     set final-hosp-id (item 0 result-hosp)
     set transfer-cost (item 1 result-hosp)
   ]
-;HERE
+
   ;; get surgeon who would perform the surgery in each hospital
   let head-surgeon (get-surgeon final-hosp-id surgery-specialty)
   let head-surgeon-duration (calculate-duration surgery-type (item 2 head-surgeon))
-  ;;set surgeon-per-hospital (get-surgeon-per-hospital surgery-specialty) ;[hospital-id surgeon-id surgeon-expertise]
-
-  ;; obtain duration of the surgery with each surgeon
-  ;foreach surgeon-per-hospital
-  ;[
-  ;  a-surgeon -> set duration (insert-item (length duration) duration (list (item 0 a-surgeon)  (calculate-duration surgery-type (item 2 a-surgeon))))
-  ;]
 
   ;; get operating rooms schedule
   let ors-list patches with [or-hosp-id != 0] ;; obtain all operating rooms
@@ -282,11 +276,11 @@ to allocate-operating-block
     set available-schedules (lput best-or-schedule available-schedules)
   ]
   let best-schedule (get-best-schedule-surgery available-schedules)
-  let s-dur duration
+  let s-dur head-surgeon-duration
   let s-id surgery-id
   ask patches with [pxcor = (item 0 best-schedule) and pycor = (item 1 best-schedule)]
   [
-    insert-surgery (item 2 best-schedule) (item 0 (item 3 best-schedule)) (get-duration-hospital s-dur or-hosp-id) (item 4 best-schedule) s-id
+    insert-surgery (item 2 best-schedule) (item 0 (item 3 best-schedule)) s-dur (item 4 best-schedule) s-id
   ]
   set actual-duration head-surgeon-duration
   set assigned-surgeon (item 1 head-surgeon)
@@ -331,7 +325,11 @@ to update-global-end-variables
   ]
   ask surgeons [
     set tot-surgeons (tot-surgeons + 1)
-    set tot-occupancy (tot-occupancy + occupied-time + operating-hours * 60 * (max-day - (length surgeon-schedule)))
+    if (length surgeon-schedule) != 0
+    [
+      ;set tot-occupancy (tot-occupancy + occupied-time / (length surgeon-schedule))
+      set tot-occupancy (tot-occupancy + occupied-time + (max-day - (length surgeon-schedule)) * operating-hours * 60)
+    ]
     let avg-surg-day 0
     let i 0
     while [i < (length surgeon-schedule)]
@@ -345,8 +343,30 @@ to update-global-end-variables
   ]
   set avg-surgeon-occupancy-rate (tot-occupancy / (tot-surgeons * operating-hours * 60 * max-day))
   set avg-surgery-day-surgeon (tot-surgery-day-surgeon / tot-surgeons)
-  ;;or-occupancy-rate
-  ;;avg-surgery-day-or
+
+  let tot-occupancy-or 0
+  let tot-ors 0
+  let tot-surgery-day-or 0
+  let max-day-or 0
+  ask patches with [or-hosp-id != 0] [
+    set max-day-or (max (list max-day-or (length or-schedule)))
+  ]
+  ask patches with [or-hosp-id != 0] [
+    set tot-ors (tot-ors + 1)
+    set tot-occupancy-or (tot-occupancy-or + or-occupied-time + (max-day-or - (length or-schedule)) * operating-hours * 60)
+    let avg-surg-day-or 0
+    let k 0
+    while [k < (length or-schedule)]
+    [
+      set avg-surg-day-or (avg-surg-day-or + (length (item k or-schedule)))
+      set k (k + 1)
+    ]
+    if k != 0
+    [set avg-surg-day-or (avg-surg-day-or / k)]
+    set tot-surgery-day-or (tot-surgery-day-or + avg-surg-day-or)
+  ]
+  set or-occupancy-rate (tot-occupancy-or / (tot-ors * operating-hours * 60 * max-day-or))
+  set avg-surgery-day-or (tot-surgery-day-or / tot-ors)
 end
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; SURGERY FUNCTIONS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -473,6 +493,7 @@ to insert-surgery [s-day s-start-time s-duration s-prep-time s-surgery]
   [
     set or-schedule (insert-item (length or-schedule) or-schedule [])
   ]
+  set or-occupied-time (or-occupied-time + s-duration + s-prep-time)
   let or-schedule-day (item s-day or-schedule)
   set or-schedule-day (insert-item (length or-schedule-day) or-schedule-day s-surgery)
   set or-schedule (replace-item s-day or-schedule or-schedule-day)
@@ -602,35 +623,6 @@ to-report get-day-free-time [schedule-day or-hospital-id surgery-prep-duration] 
   ]
   report free-time
 end
-
-;; parse surgery duration array to obtain duration for one hospital
-to-report get-duration-hospital [s-duration or-hospital-id]
-  let index 0
-  while [index < (length s-duration)]
-  [
-    if (item 0 (item index s-duration)) = or-hospital-id
-    [
-      report (item 1 (item index s-duration))
-    ]
-    set index (index + 1)
-  ]
-  report -1
-end
-
-;; parse surgery duration array to obtain duration for one hospital- s-surgeons contains list of [hospital-id surgeon-id surgeon-expertise]
-to-report get-surgeon-hospital [s-surgeons or-hospital-id]
-  let index 0
-  while [index < (length s-surgeons)]
-  [
-    if (item 0 (item index s-surgeons)) = or-hospital-id
-    [
-      report (item 1 (item index s-surgeons))
-    ]
-    set index (index + 1)
-  ]
-  report -1
-end
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; HOSPITAL FUNCTIONS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -1281,7 +1273,7 @@ MONITOR
 277
 1319
 322
-Number Transfers
+Number transfers
 number-transfer
 2
 1
@@ -1346,6 +1338,28 @@ MONITOR
 402
 Surgeon occupancy rate
 avg-surgeon-occupancy-rate
+2
+1
+11
+
+MONITOR
+909
+412
+1034
+457
+Avg surgery p/ OR
+avg-surgery-day-or
+2
+1
+11
+
+MONITOR
+1051
+412
+1187
+457
+OR occupancy rate
+or-occupancy-rate
 2
 1
 11

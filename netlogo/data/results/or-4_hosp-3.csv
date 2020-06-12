@@ -1,27 +1,3 @@
-"---------- Surgery ",171,-----------
-"urgency: ",3
-"surgery-type: ",small
-"surgery-specialty: ",vascular
-"assigned-surgeon: ",8
-final-hosp-id:,3
-"assigned-day: ",0
-"start-time: ",0
-"end-time: ",90
-"prep-time: ",30
-"actual-duration: ",60
-""
-"---------- Surgery ",125,-----------
-"urgency: ",3
-"surgery-type: ",small
-"surgery-specialty: ",vascular
-"assigned-surgeon: ",8
-final-hosp-id:,3
-"assigned-day: ",0
-"start-time: ",90
-"end-time: ",170
-"prep-time: ",20
-"actual-duration: ",60
-""
 "---------- Surgery ",193,-----------
 "urgency: ",3
 "surgery-type: ",medium
@@ -29,9 +5,9 @@ final-hosp-id:,3
 "assigned-surgeon: ",8
 final-hosp-id:,3
 "assigned-day: ",0
-"start-time: ",170
-"end-time: ",310
-"prep-time: ",20
+"start-time: ",0
+"end-time: ",160
+"prep-time: ",40
 "actual-duration: ",120
 ""
 "---------- Surgery ",123,-----------
@@ -41,10 +17,34 @@ final-hosp-id:,3
 "assigned-surgeon: ",7
 final-hosp-id:,3
 "assigned-day: ",0
-"start-time: ",310
-"end-time: ",470
+"start-time: ",160
+"end-time: ",320
 "prep-time: ",40
 "actual-duration: ",120
+""
+"---------- Surgery ",55,-----------
+"urgency: ",3
+"surgery-type: ",small
+"surgery-specialty: ",pediatric
+"assigned-surgeon: ",7
+final-hosp-id:,3
+"assigned-day: ",0
+"start-time: ",320
+"end-time: ",400
+"prep-time: ",20
+"actual-duration: ",60
+""
+"---------- Surgery ",171,-----------
+"urgency: ",3
+"surgery-type: ",small
+"surgery-specialty: ",vascular
+"assigned-surgeon: ",8
+final-hosp-id:,3
+"assigned-day: ",0
+"start-time: ",400
+"end-time: ",480
+"prep-time: ",20
+"actual-duration: ",60
 ""
 "---------- Surgery ",195,-----------
 "urgency: ",3
@@ -58,29 +58,29 @@ final-hosp-id:,3
 "prep-time: ",30
 "actual-duration: ",60
 ""
-"---------- Surgery ",55,-----------
+"---------- Surgery ",125,-----------
 "urgency: ",3
-"surgery-type: ",small
-"surgery-specialty: ",pediatric
-"assigned-surgeon: ",7
-final-hosp-id:,3
-"assigned-day: ",1
-"start-time: ",90
-"end-time: ",180
-"prep-time: ",30
-"actual-duration: ",60
-""
-"---------- Surgery ",56,-----------
-"urgency: ",2
 "surgery-type: ",small
 "surgery-specialty: ",vascular
 "assigned-surgeon: ",8
 final-hosp-id:,3
 "assigned-day: ",1
-"start-time: ",180
-"end-time: ",260
+"start-time: ",90
+"end-time: ",170
 "prep-time: ",20
 "actual-duration: ",60
+""
+"---------- Surgery ",52,-----------
+"urgency: ",2
+"surgery-type: ",medium
+"surgery-specialty: ",vascular
+"assigned-surgeon: ",8
+final-hosp-id:,3
+"assigned-day: ",1
+"start-time: ",170
+"end-time: ",310
+"prep-time: ",20
+"actual-duration: ",120
 ""
 "---------- Surgery ",2,-----------
 "urgency: ",2
@@ -89,20 +89,284 @@ final-hosp-id:,3
 "assigned-surgeon: ",7
 final-hosp-id:,3
 "assigned-day: ",1
-"start-time: ",260
-"end-time: ",400
+"start-time: ",310
+"end-time: ",470
+"prep-time: ",40
+"actual-duration: ",120
+""
+"---------- Surgery ",56,-----------
+"urgency: ",2
+"surgery-type: ",small
+"surgery-specialty: ",vascular
+"assigned-surgeon: ",8
+final-hosp-id:,3
+"assigned-day: ",2
+"start-time: ",0
+"end-time: ",90
+"prep-time: ",30
+"actual-duration: ",60
+""
+"---------- Surgery ",150,-----------
+"urgency: ",2
+"surgery-type: ",small
+"surgery-specialty: ",vascular
+"assigned-surgeon: ",8
+final-hosp-id:,3
+"assigned-day: ",2
+"start-time: ",90
+"end-time: ",170
+"prep-time: ",20
+"actual-duration: ",60
+""
+"---------- Surgery ",62,-----------
+"urgency: ",2
+"surgery-type: ",medium
+"surgery-specialty: ",vascular
+"assigned-surgeon: ",8
+final-hosp-id:,3
+"assigned-day: ",2
+"start-time: ",170
+"end-time: ",310
 "prep-time: ",20
 "actual-duration: ",120
 ""
-"---------- Surgery ",79,-----------
-"urgency: ",1
+"---------- Surgery ",157,-----------
+"urgency: ",2
+"surgery-type: ",medium
+"surgery-specialty: ",vascular
+"assigned-surgeon: ",8
+final-hosp-id:,3
+"assigned-day: ",2
+"start-time: ",310
+"end-time: ",450
+"prep-time: ",20
+"actual-duration: ",120
+""
+"---------- Surgery ",80,-----------
+"urgency: ",2
 "surgery-type: ",small
 "surgery-specialty: ",pediatric
 "assigned-surgeon: ",7
 final-hosp-id:,3
-"assigned-day: ",1
-"start-time: ",400
+"assigned-day: ",3
+"start-time: ",0
+"end-time: ",90
+"prep-time: ",30
+"actual-duration: ",60
+""
+"---------- Surgery ",86,-----------
+"urgency: ",2
+"surgery-type: ",small
+"surgery-specialty: ",vascular
+"assigned-surgeon: ",8
+final-hosp-id:,3
+"assigned-day: ",3
+"start-time: ",90
+"end-time: ",180
+"prep-time: ",30
+"actual-duration: ",60
+""
+"---------- Surgery ",17,-----------
+"urgency: ",2
+"surgery-type: ",medium
+"surgery-specialty: ",vascular
+"assigned-surgeon: ",8
+final-hosp-id:,3
+"assigned-day: ",3
+"start-time: ",180
+"end-time: ",320
+"prep-time: ",20
+"actual-duration: ",120
+""
+"---------- Surgery ",72,-----------
+"urgency: ",2
+"surgery-type: ",medium
+"surgery-specialty: ",vascular
+"assigned-surgeon: ",8
+final-hosp-id:,3
+"assigned-day: ",3
+"start-time: ",320
+"end-time: ",460
+"prep-time: ",20
+"actual-duration: ",120
+""
+"---------- Surgery ",179,-----------
+"urgency: ",2
+"surgery-type: ",big
+"surgery-specialty: ",traumatology
+"assigned-surgeon: ",9
+final-hosp-id:,3
+"assigned-day: ",4
+"start-time: ",0
+"end-time: ",220
+"prep-time: ",60
+"actual-duration: ",160
+""
+"---------- Surgery ",203,-----------
+"urgency: ",2
+"surgery-type: ",medium
+"surgery-specialty: ",traumatology
+"assigned-surgeon: ",9
+final-hosp-id:,3
+"assigned-day: ",4
+"start-time: ",220
+"end-time: ",340
+"prep-time: ",20
+"actual-duration: ",100
+""
+"---------- Surgery ",76,-----------
+"urgency: ",2
+"surgery-type: ",small
+"surgery-specialty: ",vascular
+"assigned-surgeon: ",8
+final-hosp-id:,3
+"assigned-day: ",4
+"start-time: ",340
+"end-time: ",430
+"prep-time: ",30
+"actual-duration: ",60
+""
+"---------- Surgery ",26,-----------
+"urgency: ",2
+"surgery-type: ",medium
+"surgery-specialty: ",traumatology
+"assigned-surgeon: ",9
+final-hosp-id:,3
+"assigned-day: ",5
+"start-time: ",0
+"end-time: ",140
+"prep-time: ",40
+"actual-duration: ",100
+""
+"---------- Surgery ",30,-----------
+"urgency: ",2
+"surgery-type: ",medium
+"surgery-specialty: ",traumatology
+"assigned-surgeon: ",9
+final-hosp-id:,3
+"assigned-day: ",5
+"start-time: ",140
+"end-time: ",260
+"prep-time: ",20
+"actual-duration: ",100
+""
+"---------- Surgery ",110,-----------
+"urgency: ",2
+"surgery-type: ",medium
+"surgery-specialty: ",traumatology
+"assigned-surgeon: ",9
+final-hosp-id:,3
+"assigned-day: ",5
+"start-time: ",260
+"end-time: ",380
+"prep-time: ",20
+"actual-duration: ",100
+""
+"---------- Surgery ",130,-----------
+"urgency: ",2
+"surgery-type: ",small
+"surgery-specialty: ",pediatric
+"assigned-surgeon: ",7
+final-hosp-id:,3
+"assigned-day: ",5
+"start-time: ",380
+"end-time: ",470
+"prep-time: ",30
+"actual-duration: ",60
+""
+"---------- Surgery ",153,-----------
+"urgency: ",2
+"surgery-type: ",medium
+"surgery-specialty: ",traumatology
+"assigned-surgeon: ",9
+final-hosp-id:,3
+"assigned-day: ",6
+"start-time: ",0
+"end-time: ",140
+"prep-time: ",40
+"actual-duration: ",100
+""
+"---------- Surgery ",67,-----------
+"urgency: ",2
+"surgery-type: ",medium
+"surgery-specialty: ",vascular
+"assigned-surgeon: ",8
+final-hosp-id:,3
+"assigned-day: ",6
+"start-time: ",140
+"end-time: ",300
+"prep-time: ",40
+"actual-duration: ",120
+""
+"---------- Surgery ",232,-----------
+"urgency: ",2
+"surgery-type: ",medium
+"surgery-specialty: ",traumatology
+"assigned-surgeon: ",9
+final-hosp-id:,3
+"assigned-day: ",6
+"start-time: ",300
+"end-time: ",420
+"prep-time: ",20
+"actual-duration: ",100
+""
+"---------- Surgery ",41,-----------
+"urgency: ",2
+"surgery-type: ",small
+"surgery-specialty: ",traumatology
+"assigned-surgeon: ",9
+final-hosp-id:,3
+"assigned-day: ",6
+"start-time: ",420
 "end-time: ",480
+"prep-time: ",20
+"actual-duration: ",40
+""
+"---------- Surgery ",216,-----------
+"urgency: ",2
+"surgery-type: ",small
+"surgery-specialty: ",vascular
+"assigned-surgeon: ",8
+final-hosp-id:,3
+"assigned-day: ",7
+"start-time: ",0
+"end-time: ",90
+"prep-time: ",30
+"actual-duration: ",60
+""
+"---------- Surgery ",152,-----------
+"urgency: ",2
+"surgery-type: ",medium
+"surgery-specialty: ",vascular
+"assigned-surgeon: ",8
+final-hosp-id:,3
+"assigned-day: ",7
+"start-time: ",90
+"end-time: ",230
+"prep-time: ",20
+"actual-duration: ",120
+""
+"---------- Surgery ",137,-----------
+"urgency: ",2
+"surgery-type: ",medium
+"surgery-specialty: ",vascular
+"assigned-surgeon: ",8
+final-hosp-id:,3
+"assigned-day: ",7
+"start-time: ",230
+"end-time: ",370
+"prep-time: ",20
+"actual-duration: ",120
+""
+"---------- Surgery ",226,-----------
+"urgency: ",2
+"surgery-type: ",small
+"surgery-specialty: ",vascular
+"assigned-surgeon: ",8
+final-hosp-id:,3
+"assigned-day: ",7
+"start-time: ",370
+"end-time: ",450
 "prep-time: ",20
 "actual-duration: ",60
 ""
@@ -112,82 +376,490 @@ final-hosp-id:,3
 "surgery-specialty: ",pediatric
 "assigned-surgeon: ",7
 final-hosp-id:,3
-"assigned-day: ",2
+"assigned-day: ",8
 "start-time: ",0
 "end-time: ",160
 "prep-time: ",40
 "actual-duration: ",120
 ""
-"---------- Surgery ",52,-----------
+"---------- Surgery ",13,-----------
+"urgency: ",2
+"surgery-type: ",medium
+"surgery-specialty: ",traumatology
+"assigned-surgeon: ",9
+final-hosp-id:,3
+"assigned-day: ",8
+"start-time: ",160
+"end-time: ",300
+"prep-time: ",40
+"actual-duration: ",100
+""
+"---------- Surgery ",63,-----------
+"urgency: ",2
+"surgery-type: ",medium
+"surgery-specialty: ",traumatology
+"assigned-surgeon: ",9
+final-hosp-id:,3
+"assigned-day: ",8
+"start-time: ",300
+"end-time: ",420
+"prep-time: ",20
+"actual-duration: ",100
+""
+"---------- Surgery ",111,-----------
+"urgency: ",2
+"surgery-type: ",small
+"surgery-specialty: ",traumatology
+"assigned-surgeon: ",9
+final-hosp-id:,3
+"assigned-day: ",8
+"start-time: ",420
+"end-time: ",480
+"prep-time: ",20
+"actual-duration: ",40
+""
+"---------- Surgery ",16,-----------
+"urgency: ",2
+"surgery-type: ",big
+"surgery-specialty: ",pediatric
+"assigned-surgeon: ",7
+final-hosp-id:,3
+"assigned-day: ",9
+"start-time: ",0
+"end-time: ",240
+"prep-time: ",60
+"actual-duration: ",180
+""
+"---------- Surgery ",240,-----------
+"urgency: ",2
+"surgery-type: ",medium
+"surgery-specialty: ",traumatology
+"assigned-surgeon: ",9
+final-hosp-id:,3
+"assigned-day: ",9
+"start-time: ",240
+"end-time: ",380
+"prep-time: ",40
+"actual-duration: ",100
+""
+"---------- Surgery ",146,-----------
+"urgency: ",2
+"surgery-type: ",small
+"surgery-specialty: ",vascular
+"assigned-surgeon: ",8
+final-hosp-id:,3
+"assigned-day: ",9
+"start-time: ",380
+"end-time: ",470
+"prep-time: ",30
+"actual-duration: ",60
+""
+"---------- Surgery ",202,-----------
 "urgency: ",2
 "surgery-type: ",medium
 "surgery-specialty: ",vascular
 "assigned-surgeon: ",8
 final-hosp-id:,3
-"assigned-day: ",2
-"start-time: ",160
-"end-time: ",320
+"assigned-day: ",10
+"start-time: ",0
+"end-time: ",160
 "prep-time: ",40
 "actual-duration: ",120
 ""
-"---------- Surgery ",22,-----------
+"---------- Surgery ",206,-----------
+"urgency: ",2
+"surgery-type: ",small
+"surgery-specialty: ",vascular
+"assigned-surgeon: ",8
+final-hosp-id:,3
+"assigned-day: ",10
+"start-time: ",160
+"end-time: ",240
+"prep-time: ",20
+"actual-duration: ",60
+""
+"---------- Surgery ",39,-----------
+"urgency: ",2
+"surgery-type: ",big
+"surgery-specialty: ",traumatology
+"assigned-surgeon: ",9
+final-hosp-id:,3
+"assigned-day: ",10
+"start-time: ",240
+"end-time: ",460
+"prep-time: ",60
+"actual-duration: ",160
+""
+"---------- Surgery ",207,-----------
+"urgency: ",2
+"surgery-type: ",medium
+"surgery-specialty: ",vascular
+"assigned-surgeon: ",8
+final-hosp-id:,3
+"assigned-day: ",11
+"start-time: ",0
+"end-time: ",160
+"prep-time: ",40
+"actual-duration: ",120
+""
+"---------- Surgery ",83,-----------
 "urgency: ",2
 "surgery-type: ",medium
 "surgery-specialty: ",traumatology
 "assigned-surgeon: ",9
 final-hosp-id:,3
-"assigned-day: ",2
-"start-time: ",320
-"end-time: ",460
+"assigned-day: ",11
+"start-time: ",160
+"end-time: ",300
 "prep-time: ",40
 "actual-duration: ",100
 ""
-"---------- Surgery ",217,-----------
-"urgency: ",1
+"---------- Surgery ",100,-----------
+"urgency: ",2
 "surgery-type: ",medium
 "surgery-specialty: ",traumatology
 "assigned-surgeon: ",9
 final-hosp-id:,3
-"assigned-day: ",3
+"assigned-day: ",11
+"start-time: ",300
+"end-time: ",420
+"prep-time: ",20
+"actual-duration: ",100
+""
+"---------- Surgery ",186,-----------
+"urgency: ",1
+"surgery-type: ",small
+"surgery-specialty: ",traumatology
+"assigned-surgeon: ",9
+final-hosp-id:,3
+"assigned-day: ",11
+"start-time: ",420
+"end-time: ",480
+"prep-time: ",20
+"actual-duration: ",40
+""
+"---------- Surgery ",192,-----------
+"urgency: ",2
+"surgery-type: ",medium
+"surgery-specialty: ",vascular
+"assigned-surgeon: ",8
+final-hosp-id:,3
+"assigned-day: ",12
+"start-time: ",0
+"end-time: ",160
+"prep-time: ",40
+"actual-duration: ",120
+""
+"---------- Surgery ",96,-----------
+"urgency: ",2
+"surgery-type: ",medium
+"surgery-specialty: ",traumatology
+"assigned-surgeon: ",9
+final-hosp-id:,3
+"assigned-day: ",12
+"start-time: ",160
+"end-time: ",300
+"prep-time: ",40
+"actual-duration: ",100
+""
+"---------- Surgery ",132,-----------
+"urgency: ",2
+"surgery-type: ",medium
+"surgery-specialty: ",vascular
+"assigned-surgeon: ",8
+final-hosp-id:,3
+"assigned-day: ",12
+"start-time: ",300
+"end-time: ",440
+"prep-time: ",20
+"actual-duration: ",120
+""
+"---------- Surgery ",190,-----------
+"urgency: ",2
+"surgery-type: ",medium
+"surgery-specialty: ",traumatology
+"assigned-surgeon: ",9
+final-hosp-id:,3
+"assigned-day: ",13
 "start-time: ",0
 "end-time: ",140
 "prep-time: ",40
 "actual-duration: ",100
 ""
-"---------- Surgery ",114,-----------
-"urgency: ",1
+"---------- Surgery ",126,-----------
+"urgency: ",2
+"surgery-type: ",small
+"surgery-specialty: ",vascular
+"assigned-surgeon: ",8
+final-hosp-id:,3
+"assigned-day: ",13
+"start-time: ",140
+"end-time: ",230
+"prep-time: ",30
+"actual-duration: ",60
+""
+"---------- Surgery ",223,-----------
+"urgency: ",2
 "surgery-type: ",medium
 "surgery-specialty: ",traumatology
 "assigned-surgeon: ",9
 final-hosp-id:,3
-"assigned-day: ",3
-"start-time: ",140
-"end-time: ",260
+"assigned-day: ",13
+"start-time: ",230
+"end-time: ",350
 "prep-time: ",20
 "actual-duration: ",100
 ""
-"---------- Surgery ",247,-----------
-"urgency: ",1
+"---------- Surgery ",220,-----------
+"urgency: ",2
 "surgery-type: ",small
 "surgery-specialty: ",pediatric
 "assigned-surgeon: ",7
 final-hosp-id:,3
-"assigned-day: ",3
-"start-time: ",260
-"end-time: ",350
+"assigned-day: ",13
+"start-time: ",350
+"end-time: ",440
 "prep-time: ",30
 "actual-duration: ",60
 ""
-"---------- Surgery ",24,-----------
-"urgency: ",1
+"---------- Surgery ",161,-----------
+"urgency: ",2
+"surgery-type: ",big
+"surgery-specialty: ",vascular
+"assigned-surgeon: ",8
+final-hosp-id:,3
+"assigned-day: ",14
+"start-time: ",0
+"end-time: ",240
+"prep-time: ",60
+"actual-duration: ",180
+""
+"---------- Surgery ",119,-----------
+"urgency: ",2
+"surgery-type: ",big
+"surgery-specialty: ",traumatology
+"assigned-surgeon: ",9
+final-hosp-id:,3
+"assigned-day: ",14
+"start-time: ",240
+"end-time: ",460
+"prep-time: ",60
+"actual-duration: ",160
+""
+"---------- Surgery ",180,-----------
+"urgency: ",2
+"surgery-type: ",medium
+"surgery-specialty: ",traumatology
+"assigned-surgeon: ",9
+final-hosp-id:,3
+"assigned-day: ",15
+"start-time: ",0
+"end-time: ",140
+"prep-time: ",40
+"actual-duration: ",100
+""
+"---------- Surgery ",60,-----------
+"urgency: ",2
 "surgery-type: ",small
 "surgery-specialty: ",pediatric
 "assigned-surgeon: ",7
 final-hosp-id:,3
-"assigned-day: ",3
-"start-time: ",350
-"end-time: ",430
+"assigned-day: ",15
+"start-time: ",140
+"end-time: ",230
+"prep-time: ",30
+"actual-duration: ",60
+""
+"---------- Surgery ",91,-----------
+"urgency: ",2
+"surgery-type: ",big
+"surgery-specialty: ",vascular
+"assigned-surgeon: ",8
+final-hosp-id:,3
+"assigned-day: ",15
+"start-time: ",230
+"end-time: ",470
+"prep-time: ",60
+"actual-duration: ",180
+""
+"---------- Surgery ",136,-----------
+"urgency: ",2
+"surgery-type: ",small
+"surgery-specialty: ",vascular
+"assigned-surgeon: ",8
+final-hosp-id:,3
+"assigned-day: ",16
+"start-time: ",0
+"end-time: ",90
+"prep-time: ",30
+"actual-duration: ",60
+""
+"---------- Surgery ",182,-----------
+"urgency: ",2
+"surgery-type: ",small
+"surgery-specialty: ",pediatric
+"assigned-surgeon: ",7
+final-hosp-id:,3
+"assigned-day: ",16
+"start-time: ",90
+"end-time: ",180
+"prep-time: ",30
+"actual-duration: ",60
+""
+"---------- Surgery ",166,-----------
+"urgency: ",2
+"surgery-type: ",medium
+"surgery-specialty: ",traumatology
+"assigned-surgeon: ",9
+final-hosp-id:,3
+"assigned-day: ",16
+"start-time: ",180
+"end-time: ",320
+"prep-time: ",40
+"actual-duration: ",100
+""
+"---------- Surgery ",40,-----------
+"urgency: ",2
+"surgery-type: ",medium
+"surgery-specialty: ",traumatology
+"assigned-surgeon: ",9
+final-hosp-id:,3
+"assigned-day: ",16
+"start-time: ",320
+"end-time: ",440
 "prep-time: ",20
+"actual-duration: ",100
+""
+"---------- Surgery ",120,-----------
+"urgency: ",2
+"surgery-type: ",medium
+"surgery-specialty: ",traumatology
+"assigned-surgeon: ",9
+final-hosp-id:,3
+"assigned-day: ",17
+"start-time: ",0
+"end-time: ",140
+"prep-time: ",40
+"actual-duration: ",100
+""
+"---------- Surgery ",189,-----------
+"urgency: ",2
+"surgery-type: ",big
+"surgery-specialty: ",pediatric
+"assigned-surgeon: ",7
+final-hosp-id:,3
+"assigned-day: ",17
+"start-time: ",140
+"end-time: ",380
+"prep-time: ",60
+"actual-duration: ",180
+""
+"---------- Surgery ",6,-----------
+"urgency: ",2
+"surgery-type: ",small
+"surgery-specialty: ",vascular
+"assigned-surgeon: ",8
+final-hosp-id:,3
+"assigned-day: ",17
+"start-time: ",380
+"end-time: ",470
+"prep-time: ",30
+"actual-duration: ",60
+""
+"---------- Surgery ",133,-----------
+"urgency: ",2
+"surgery-type: ",medium
+"surgery-specialty: ",traumatology
+"assigned-surgeon: ",9
+final-hosp-id:,3
+"assigned-day: ",18
+"start-time: ",0
+"end-time: ",140
+"prep-time: ",40
+"actual-duration: ",100
+""
+"---------- Surgery ",196,-----------
+"urgency: ",2
+"surgery-type: ",small
+"surgery-specialty: ",vascular
+"assigned-surgeon: ",8
+final-hosp-id:,3
+"assigned-day: ",18
+"start-time: ",140
+"end-time: ",230
+"prep-time: ",30
+"actual-duration: ",60
+""
+"---------- Surgery ",8,-----------
+"urgency: ",1
+"surgery-type: ",small
+"surgery-specialty: ",vascular
+"assigned-surgeon: ",8
+final-hosp-id:,3
+"assigned-day: ",18
+"start-time: ",230
+"end-time: ",310
+"prep-time: ",20
+"actual-duration: ",60
+""
+"---------- Surgery ",194,-----------
+"urgency: ",1
+"surgery-type: ",small
+"surgery-specialty: ",vascular
+"assigned-surgeon: ",8
+final-hosp-id:,3
+"assigned-day: ",18
+"start-time: ",310
+"end-time: ",390
+"prep-time: ",20
+"actual-duration: ",60
+""
+"---------- Surgery ",34,-----------
+"urgency: ",1
+"surgery-type: ",small
+"surgery-specialty: ",traumatology
+"assigned-surgeon: ",9
+final-hosp-id:,3
+"assigned-day: ",18
+"start-time: ",390
+"end-time: ",450
+"prep-time: ",20
+"actual-duration: ",40
+""
+"---------- Surgery ",51,-----------
+"urgency: ",1
+"surgery-type: ",big
+"surgery-specialty: ",vascular
+"assigned-surgeon: ",8
+final-hosp-id:,3
+"assigned-day: ",19
+"start-time: ",0
+"end-time: ",240
+"prep-time: ",60
+"actual-duration: ",180
+""
+"---------- Surgery ",118,-----------
+"urgency: ",1
+"surgery-type: ",big
+"surgery-specialty: ",traumatology
+"assigned-surgeon: ",9
+final-hosp-id:,3
+"assigned-day: ",19
+"start-time: ",240
+"end-time: ",460
+"prep-time: ",60
+"actual-duration: ",160
+""
+"---------- Surgery ",225,-----------
+"urgency: ",1
+"surgery-type: ",small
+"surgery-specialty: ",vascular
+"assigned-surgeon: ",8
+final-hosp-id:,3
+"assigned-day: ",20
+"start-time: ",0
+"end-time: ",90
+"prep-time: ",30
 "actual-duration: ",60
 ""
 "---------- Surgery ",54,-----------
@@ -196,9 +868,201 @@ final-hosp-id:,3
 "surgery-specialty: ",pediatric
 "assigned-surgeon: ",7
 final-hosp-id:,3
-"assigned-day: ",4
+"assigned-day: ",20
+"start-time: ",90
+"end-time: ",180
+"prep-time: ",30
+"actual-duration: ",60
+""
+"---------- Surgery ",217,-----------
+"urgency: ",1
+"surgery-type: ",medium
+"surgery-specialty: ",traumatology
+"assigned-surgeon: ",9
+final-hosp-id:,3
+"assigned-day: ",20
+"start-time: ",180
+"end-time: ",320
+"prep-time: ",40
+"actual-duration: ",100
+""
+"---------- Surgery ",7,-----------
+"urgency: ",1
+"surgery-type: ",medium
+"surgery-specialty: ",traumatology
+"assigned-surgeon: ",9
+final-hosp-id:,3
+"assigned-day: ",20
+"start-time: ",320
+"end-time: ",440
+"prep-time: ",20
+"actual-duration: ",100
+""
+"---------- Surgery ",98,-----------
+"urgency: ",1
+"surgery-type: ",small
+"surgery-specialty: ",traumatology
+"assigned-surgeon: ",9
+final-hosp-id:,3
+"assigned-day: ",21
+"start-time: ",0
+"end-time: ",70
+"prep-time: ",30
+"actual-duration: ",40
+""
+"---------- Surgery ",183,-----------
+"urgency: ",1
+"surgery-type: ",medium
+"surgery-specialty: ",traumatology
+"assigned-surgeon: ",9
+final-hosp-id:,3
+"assigned-day: ",21
+"start-time: ",70
+"end-time: ",190
+"prep-time: ",20
+"actual-duration: ",100
+""
+"---------- Surgery ",44,-----------
+"urgency: ",1
+"surgery-type: ",medium
+"surgery-specialty: ",traumatology
+"assigned-surgeon: ",9
+final-hosp-id:,3
+"assigned-day: ",21
+"start-time: ",190
+"end-time: ",310
+"prep-time: ",20
+"actual-duration: ",100
+""
+"---------- Surgery ",198,-----------
+"urgency: ",1
+"surgery-type: ",small
+"surgery-specialty: ",vascular
+"assigned-surgeon: ",8
+final-hosp-id:,3
+"assigned-day: ",21
+"start-time: ",310
+"end-time: ",400
+"prep-time: ",30
+"actual-duration: ",60
+""
+"---------- Surgery ",144,-----------
+"urgency: ",1
+"surgery-type: ",small
+"surgery-specialty: ",vascular
+"assigned-surgeon: ",8
+final-hosp-id:,3
+"assigned-day: ",21
+"start-time: ",400
+"end-time: ",480
+"prep-time: ",20
+"actual-duration: ",60
+""
+"---------- Surgery ",205,-----------
+"urgency: ",1
+"surgery-type: ",small
+"surgery-specialty: ",pediatric
+"assigned-surgeon: ",7
+final-hosp-id:,3
+"assigned-day: ",22
 "start-time: ",0
 "end-time: ",90
+"prep-time: ",30
+"actual-duration: ",60
+""
+"---------- Surgery ",99,-----------
+"urgency: ",1
+"surgery-type: ",small
+"surgery-specialty: ",traumatology
+"assigned-surgeon: ",9
+final-hosp-id:,3
+"assigned-day: ",22
+"start-time: ",90
+"end-time: ",160
+"prep-time: ",30
+"actual-duration: ",40
+""
+"---------- Surgery ",106,-----------
+"urgency: ",1
+"surgery-type: ",big
+"surgery-specialty: ",traumatology
+"assigned-surgeon: ",9
+final-hosp-id:,3
+"assigned-day: ",22
+"start-time: ",160
+"end-time: ",340
+"prep-time: ",20
+"actual-duration: ",160
+""
+"---------- Surgery ",129,-----------
+"urgency: ",1
+"surgery-type: ",small
+"surgery-specialty: ",vascular
+"assigned-surgeon: ",8
+final-hosp-id:,3
+"assigned-day: ",22
+"start-time: ",340
+"end-time: ",430
+"prep-time: ",30
+"actual-duration: ",60
+""
+"---------- Surgery ",140,-----------
+"urgency: ",1
+"surgery-type: ",big
+"surgery-specialty: ",pediatric
+"assigned-surgeon: ",7
+final-hosp-id:,3
+"assigned-day: ",23
+"start-time: ",0
+"end-time: ",240
+"prep-time: ",60
+"actual-duration: ",180
+""
+"---------- Surgery ",77,-----------
+"urgency: ",1
+"surgery-type: ",medium
+"surgery-specialty: ",traumatology
+"assigned-surgeon: ",9
+final-hosp-id:,3
+"assigned-day: ",23
+"start-time: ",240
+"end-time: ",380
+"prep-time: ",40
+"actual-duration: ",100
+""
+"---------- Surgery ",148,-----------
+"urgency: ",1
+"surgery-type: ",small
+"surgery-specialty: ",vascular
+"assigned-surgeon: ",8
+final-hosp-id:,3
+"assigned-day: ",23
+"start-time: ",380
+"end-time: ",470
+"prep-time: ",30
+"actual-duration: ",60
+""
+"---------- Surgery ",139,-----------
+"urgency: ",1
+"surgery-type: ",small
+"surgery-specialty: ",pediatric
+"assigned-surgeon: ",7
+final-hosp-id:,3
+"assigned-day: ",24
+"start-time: ",0
+"end-time: ",90
+"prep-time: ",30
+"actual-duration: ",60
+""
+"---------- Surgery ",58,-----------
+"urgency: ",1
+"surgery-type: ",small
+"surgery-specialty: ",vascular
+"assigned-surgeon: ",8
+final-hosp-id:,3
+"assigned-day: ",24
+"start-time: ",90
+"end-time: ",180
 "prep-time: ",30
 "actual-duration: ",60
 ""
@@ -208,57 +1072,93 @@ final-hosp-id:,3
 "surgery-specialty: ",vascular
 "assigned-surgeon: ",8
 final-hosp-id:,3
-"assigned-day: ",4
-"start-time: ",90
-"end-time: ",180
-"prep-time: ",30
-"actual-duration: ",60
-""
-"---------- Surgery ",205,-----------
-"urgency: ",1
-"surgery-type: ",small
-"surgery-specialty: ",pediatric
-"assigned-surgeon: ",7
-final-hosp-id:,3
-"assigned-day: ",4
+"assigned-day: ",24
 "start-time: ",180
 "end-time: ",260
 "prep-time: ",20
 "actual-duration: ",60
 ""
-"---------- Surgery ",141,-----------
+"---------- Surgery ",184,-----------
 "urgency: ",1
-"surgery-type: ",big
-"surgery-specialty: ",vascular
-"assigned-surgeon: ",8
+"surgery-type: ",medium
+"surgery-specialty: ",traumatology
+"assigned-surgeon: ",9
 final-hosp-id:,3
-"assigned-day: ",4
+"assigned-day: ",24
 "start-time: ",260
-"end-time: ",460
-"prep-time: ",20
-"actual-duration: ",180
+"end-time: ",400
+"prep-time: ",40
+"actual-duration: ",100
 ""
-"---------- Surgery ",74,-----------
+"---------- Surgery ",24,-----------
 "urgency: ",1
 "surgery-type: ",small
 "surgery-specialty: ",pediatric
 "assigned-surgeon: ",7
 final-hosp-id:,3
-"assigned-day: ",5
-"start-time: ",0
-"end-time: ",90
-"prep-time: ",30
+"assigned-day: ",24
+"start-time: ",400
+"end-time: ",480
+"prep-time: ",20
 "actual-duration: ",60
 ""
-"---------- Surgery ",78,-----------
+"---------- Surgery ",32,-----------
+"urgency: ",1
+"surgery-type: ",big
+"surgery-specialty: ",traumatology
+"assigned-surgeon: ",9
+final-hosp-id:,3
+"assigned-day: ",25
+"start-time: ",0
+"end-time: ",220
+"prep-time: ",60
+"actual-duration: ",160
+""
+"---------- Surgery ",121,-----------
+"urgency: ",1
+"surgery-type: ",big
+"surgery-specialty: ",vascular
+"assigned-surgeon: ",8
+final-hosp-id:,3
+"assigned-day: ",25
+"start-time: ",220
+"end-time: ",460
+"prep-time: ",60
+"actual-duration: ",180
+""
+"---------- Surgery ",43,-----------
+"urgency: ",1
+"surgery-type: ",medium
+"surgery-specialty: ",traumatology
+"assigned-surgeon: ",9
+final-hosp-id:,3
+"assigned-day: ",26
+"start-time: ",0
+"end-time: ",140
+"prep-time: ",40
+"actual-duration: ",100
+""
+"---------- Surgery ",128,-----------
 "urgency: ",1
 "surgery-type: ",small
 "surgery-specialty: ",vascular
 "assigned-surgeon: ",8
 final-hosp-id:,3
-"assigned-day: ",5
-"start-time: ",90
-"end-time: ",180
+"assigned-day: ",26
+"start-time: ",140
+"end-time: ",230
+"prep-time: ",30
+"actual-duration: ",60
+""
+"---------- Surgery ",209,-----------
+"urgency: ",1
+"surgery-type: ",small
+"surgery-specialty: ",pediatric
+"assigned-surgeon: ",7
+final-hosp-id:,3
+"assigned-day: ",26
+"start-time: ",230
+"end-time: ",320
 "prep-time: ",30
 "actual-duration: ",60
 ""
@@ -268,47 +1168,47 @@ final-hosp-id:,3
 "surgery-specialty: ",traumatology
 "assigned-surgeon: ",9
 final-hosp-id:,3
-"assigned-day: ",5
-"start-time: ",180
-"end-time: ",250
+"assigned-day: ",26
+"start-time: ",320
+"end-time: ",380
+"prep-time: ",20
+"actual-duration: ",40
+""
+"---------- Surgery ",135,-----------
+"urgency: ",1
+"surgery-type: ",small
+"surgery-specialty: ",vascular
+"assigned-surgeon: ",8
+final-hosp-id:,3
+"assigned-day: ",26
+"start-time: ",380
+"end-time: ",460
+"prep-time: ",20
+"actual-duration: ",60
+""
+"---------- Surgery ",173,-----------
+"urgency: ",1
+"surgery-type: ",small
+"surgery-specialty: ",traumatology
+"assigned-surgeon: ",9
+final-hosp-id:,3
+"assigned-day: ",27
+"start-time: ",0
+"end-time: ",70
 "prep-time: ",30
 "actual-duration: ",40
 ""
-"---------- Surgery ",194,-----------
+"---------- Surgery ",174,-----------
 "urgency: ",1
 "surgery-type: ",small
-"surgery-specialty: ",vascular
-"assigned-surgeon: ",8
+"surgery-specialty: ",traumatology
+"assigned-surgeon: ",9
 final-hosp-id:,3
-"assigned-day: ",5
-"start-time: ",250
-"end-time: ",330
+"assigned-day: ",27
+"start-time: ",70
+"end-time: ",130
 "prep-time: ",20
-"actual-duration: ",60
-""
-"---------- Surgery ",19,-----------
-"urgency: ",1
-"surgery-type: ",small
-"surgery-specialty: ",pediatric
-"assigned-surgeon: ",7
-final-hosp-id:,3
-"assigned-day: ",5
-"start-time: ",330
-"end-time: ",410
-"prep-time: ",20
-"actual-duration: ",60
-""
-"---------- Surgery ",129,-----------
-"urgency: ",1
-"surgery-type: ",small
-"surgery-specialty: ",vascular
-"assigned-surgeon: ",8
-final-hosp-id:,3
-"assigned-day: ",6
-"start-time: ",0
-"end-time: ",90
-"prep-time: ",30
-"actual-duration: ",60
+"actual-duration: ",40
 ""
 "---------- Surgery ",169,-----------
 "urgency: ",1
@@ -316,21 +1216,21 @@ final-hosp-id:,3
 "surgery-specialty: ",pediatric
 "assigned-surgeon: ",7
 final-hosp-id:,3
-"assigned-day: ",6
-"start-time: ",90
-"end-time: ",180
+"assigned-day: ",27
+"start-time: ",130
+"end-time: ",220
 "prep-time: ",30
 "actual-duration: ",60
 ""
-"---------- Surgery ",59,-----------
+"---------- Surgery ",247,-----------
 "urgency: ",1
 "surgery-type: ",small
-"surgery-specialty: ",vascular
-"assigned-surgeon: ",8
+"surgery-specialty: ",pediatric
+"assigned-surgeon: ",7
 final-hosp-id:,3
-"assigned-day: ",6
-"start-time: ",180
-"end-time: ",260
+"assigned-day: ",27
+"start-time: ",220
+"end-time: ",300
 "prep-time: ",20
 "actual-duration: ",60
 ""
@@ -340,9 +1240,69 @@ final-hosp-id:,3
 "surgery-specialty: ",pediatric
 "assigned-surgeon: ",7
 final-hosp-id:,3
-"assigned-day: ",6
-"start-time: ",260
-"end-time: ",340
+"assigned-day: ",27
+"start-time: ",300
+"end-time: ",380
 "prep-time: ",20
 "actual-duration: ",60
+""
+"---------- Surgery ",104,-----------
+"urgency: ",1
+"surgery-type: ",small
+"surgery-specialty: ",traumatology
+"assigned-surgeon: ",9
+final-hosp-id:,3
+"assigned-day: ",27
+"start-time: ",380
+"end-time: ",440
+"prep-time: ",20
+"actual-duration: ",40
+""
+"---------- Surgery ",176,-----------
+"urgency: ",1
+"surgery-type: ",big
+"surgery-specialty: ",traumatology
+"assigned-surgeon: ",9
+final-hosp-id:,3
+"assigned-day: ",28
+"start-time: ",0
+"end-time: ",220
+"prep-time: ",60
+"actual-duration: ",160
+""
+"---------- Surgery ",46,-----------
+"urgency: ",1
+"surgery-type: ",small
+"surgery-specialty: ",traumatology
+"assigned-surgeon: ",9
+final-hosp-id:,3
+"assigned-day: ",28
+"start-time: ",220
+"end-time: ",280
+"prep-time: ",20
+"actual-duration: ",40
+""
+"---------- Surgery ",234,-----------
+"urgency: ",1
+"surgery-type: ",small
+"surgery-specialty: ",traumatology
+"assigned-surgeon: ",9
+final-hosp-id:,3
+"assigned-day: ",28
+"start-time: ",280
+"end-time: ",340
+"prep-time: ",20
+"actual-duration: ",40
+""
+"---------- Surgery ",127,-----------
+"urgency: ",1
+"surgery-type: ",medium
+"surgery-specialty: ",traumatology
+"assigned-surgeon: ",9
+final-hosp-id:,3
+"assigned-day: ",28
+"start-time: ",340
+"end-time: ",460
+"prep-time: ",20
+"actual-duration: ",100
 ""
