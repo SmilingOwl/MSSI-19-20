@@ -949,10 +949,10 @@ to print-schedule [schedule n]
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-687
-16
-1160
-490
+413
+18
+886
+492
 -1
 -1
 15.0
@@ -976,10 +976,10 @@ ticks
 30.0
 
 BUTTON
-244
-54
-414
-87
+129
+212
+299
+245
 Allocate Operating Blocks
 go
 NIL
@@ -993,20 +993,20 @@ NIL
 1
 
 CHOOSER
-15
-14
-194
-59
+28
+41
+207
+86
 heuristic
 heuristic
 "minimize-prep-time" "minimize-waiting-time"
-0
+1
 
 BUTTON
-244
-19
-413
-52
+130
+172
+299
+205
 Setup Experiment
 setup
 NIL
@@ -1020,36 +1020,36 @@ NIL
 1
 
 INPUTBOX
-15
-128
-193
-188
+28
+95
+206
+155
 data-folder
-data/overflow
+data/two_hospitals
 1
 0
 String
 
 SLIDER
-15
-204
-194
-237
+218
+107
+397
+140
 operating-hours
 operating-hours
 8
 16
-12.0
+14.0
 1
 1
 NIL
 HORIZONTAL
 
 PLOT
-14
-255
-214
-405
+908
+46
+1108
+196
 Waiting Time
 Ticks
 Waiting Time
@@ -1064,65 +1064,65 @@ PENS
 "Average" 1.0 0 -2674135 true "" "plot average-waiting-time"
 
 MONITOR
-436
-308
-561
-353
-average prep time
+1047
+222
+1172
+267
+Average prep time
 average-prep-time
 2
 1
 11
 
 MONITOR
-573
-255
-665
-300
-max prep time
+1066
+276
+1158
+321
+Max prep time
 max-prep-time
 2
 1
 11
 
 MONITOR
-436
-360
-561
-405
-max waiting time
+910
+277
+1035
+322
+Max waiting time
 max-waiting-time
 2
 1
 11
 
 MONITOR
-436
-255
-561
-300
-average waiting time
+908
+222
+1037
+267
+Average waiting time
 average-waiting-time
 2
 1
 11
 
 MONITOR
-231
-130
-324
-175
-total surgeries
+29
+337
+124
+382
+Total surgeries
 total-surgeries
 17
 1
 11
 
 PLOT
-225
-255
-425
-405
+1117
+46
+1317
+196
 Preparation Time
 Ticks
 Preparation Time
@@ -1137,42 +1137,42 @@ PENS
 "default" 1.0 0 -13840069 true "" "plot average-prep-time"
 
 CHOOSER
-15
-71
-195
-116
+217
+41
+397
+86
 hospital-transfer
 hospital-transfer
 "none" "waiting time" "surgeon occupancy" "number surgeries"
 1
 
 MONITOR
-353
-193
-447
-238
-total surgeons
+151
+400
+246
+445
+Total surgeons
 total-surgeons
 17
 1
 11
 
 MONITOR
-232
-193
-322
-238
-total hospitals
+30
+400
+123
+445
+Total hospitals
 total-hospitals
 17
 1
 11
 
 MONITOR
-351
-130
-447
-175
+149
+337
+245
+382
 Number of ORs
 total-or
 17
@@ -1180,10 +1180,10 @@ total-or
 11
 
 BUTTON
-244
-89
-415
-122
+129
+252
+300
+285
 Show Allocation Results
 show-results
 NIL
@@ -1197,10 +1197,10 @@ NIL
 1
 
 MONITOR
-570
-308
-669
-353
+1206
+274
+1305
+319
 Number Transfers
 number-transfer
 2
@@ -1208,15 +1208,45 @@ number-transfer
 11
 
 MONITOR
-568
-362
-677
-407
-avg transfer cost
+1185
+221
+1320
+266
+Average transfer cost
 average-transfer-cost
 2
 1
 11
+
+TEXTBOX
+32
+304
+182
+329
+DATA:
+15
+0.0
+1
+
+TEXTBOX
+907
+15
+1057
+34
+RESULTS:
+15
+0.0
+1
+
+TEXTBOX
+30
+14
+180
+33
+System Setup:\n
+15
+0.0
+1
 
 @#$#@#$#@
 ## WHAT IS IT?
