@@ -832,7 +832,7 @@ to create-hospitals-data
       set color black
       setxy 15 15
       set hospital-id item 0 data
-      set hospital-color (hospital-id * 10 + 16)
+      set hospital-color (hospital-id * 10 + 5)
       set hospital-type item 1 data
       set or-number item 2 data
       set number-ors or-number
