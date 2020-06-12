@@ -81,9 +81,9 @@ to setup
   set max-waiting-time 0
   set total-prep-time 0
   set max-prep-time 0
-  create-surgeries-data
   create-hospitals-data
   create-surgeons-data
+  create-surgeries-data
   order-surgeries
   set total-hospitals count hospitals
   set total-surgeons count surgeons
@@ -318,21 +318,29 @@ to-report get-hospital-for-surgery [original-hospital specialty]
   let original-hosp-info []
   ask hospitals [
     let metric 0
+    let surgeries-done 0
+    let surgeries-todo 0
     if hospital-transfer = "surgeon occupancy"
     [
       set metric (get-total-occupied-time specialty)
+      set surgeries-done  get-total-surgeries-done
+      set surgeries-todo  get-total-surgeries
     ]
     if hospital-transfer = "waiting time"
     [
       set metric (max (list get-min-last-day-or get-min-last-day-surgeon specialty))
+      set surgeries-done  get-total-surgeries-done
+      set surgeries-todo  get-total-surgeries
     ]
     if hospital-transfer = "number surgeries"
     [
       set metric get-total-surgeries
+      set surgeries-done  get-total-surgeries-done
+      set surgeries-todo  get-total-surgeries
     ]
-    set hosp-info (lput (list hospital-id metric (calculate-transfer-cost original-hospital hospital-id) number-ors) hosp-info)
+    set hosp-info (lput (list hospital-id metric (calculate-transfer-cost original-hospital hospital-id) number-ors surgeries-done surgeries-todo) hosp-info)
     if hospital-id = original-hospital
-    [ set original-hosp-info (list hospital-id metric (calculate-transfer-cost original-hospital hospital-id) number-ors)]
+    [ set original-hosp-info (list hospital-id metric (calculate-transfer-cost original-hospital hospital-id) number-ors surgeries-done surgeries-todo)]
   ]
   let total-metric 0
   let i 0
@@ -348,7 +356,9 @@ to-report get-hospital-for-surgery [original-hospital specialty]
     set i 0
     while [i < (length hosp-info)]
     [
-      if (item 1 (item i hosp-info)) / (item 3 (item i hosp-info)) < 2 * (item 1 original-hosp-info) / (item 3 original-hosp-info) and ((item 2 best-hospital) = 0 or (item 2 best-hospital) > (item 2 (item i hosp-info)))
+      if (item 1 (item i hosp-info)) / (item 3 (item i hosp-info)) < 2 * (item 1 original-hosp-info) / (item 3 original-hosp-info) and
+      ((item 2 best-hospital) = 0 or (item 2 best-hospital) > (item 2 (item i hosp-info))) and
+      ((item 4 (item i hosp-info)) > 0.5 * ((item 4 (item i hosp-info)) + (item 1 (item i hosp-info))))
       [ set best-hospital (item i hosp-info) ]
       set i (i + 1)
     ]
@@ -359,7 +369,8 @@ to-report get-hospital-for-surgery [original-hospital specialty]
     set i 0
     while [i < (length hosp-info)]
     [
-      if (item 1 (item i hosp-info)) < 2 * (item 1 original-hosp-info) and ((item 2 best-hospital) = 0 or (item 2 best-hospital) > (item 2 (item i hosp-info)))
+      if (item 1 (item i hosp-info)) < 2 * (item 1 original-hosp-info) and ((item 2 best-hospital) = 0 or (item 2 best-hospital) > (item 2 (item i hosp-info))) and
+      ((item 4 (item i hosp-info)) > 0.5 * ((item 4 (item i hosp-info)) + (item 5 (item i hosp-info))))
       [ set best-hospital (item i hosp-info) ]
       set i (i + 1)
     ]
@@ -646,9 +657,20 @@ to-report get-total-surgeries
   report total
 end
 
+to-report get-total-surgeries-done
+  let total 0
+  let hospit-id hospital-id
+  ask surgeries with [hospit-id = final-hosp-id]
+  [
+    set total (total + 1)
+  ]
+  report total
+end
+
 to-report get-total-occupied-time [specialty]
   let s-occupied-time 0
-  ask surgeons with [surgeon-hosp-id = hospital-id and surgeon-specialty = specialty] [
+  let hospit-id hospital-id
+  ask surgeons with [surgeon-hosp-id = hospit-id and surgeon-specialty = specialty] [
     set s-occupied-time (s-occupied-time + occupied-time)
   ]
   report s-occupied-time
@@ -817,7 +839,7 @@ to create-surgeries-data
       [set random-y (random-float 1)]
       [set random-y (random-float -1)]
       set xcor -13 + random-x
-      set ycor ( + random-y)
+      set ycor (patch-y + random-y)
       ifelse urgency = 1
       [set color green]
       [
@@ -1164,7 +1186,7 @@ CHOOSER
 hospital-transfer
 hospital-transfer
 "none" "waiting time" "surgeon occupancy" "number surgeries"
-0
+2
 
 MONITOR
 151
@@ -1253,7 +1275,7 @@ TEXTBOX
 15
 1057
 34
-RESULTS:
+Results:
 15
 0.0
 1
