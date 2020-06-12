@@ -16,6 +16,10 @@ globals
   average-transfer-cost
   max-transfer-cost
   total-transfer-cost
+  avg-surgeon-occupancy-rate
+  or-occupancy-rate
+  avg-surgery-day-surgeon
+  avg-surgery-day-or
 ]
 
 ;; agents
@@ -81,6 +85,10 @@ to setup
   set max-waiting-time 0
   set total-prep-time 0
   set max-prep-time 0
+  set avg-surgeon-occupancy-rate 0
+  set or-occupancy-rate 0
+  set avg-surgery-day-surgeon 0
+  set avg-surgery-day-or 0
   create-hospitals-data
   create-surgeons-data
   create-surgeries-data
@@ -150,6 +158,8 @@ to show-results
     ]
     set day (day + 1)
   ]
+  update-global-end-variables
+  tick
 end
 
 to move
@@ -309,6 +319,34 @@ to update-global-variables [waiting-time s-prep-time s-transfer-cost]
     set number-transfer (number-transfer + 1)
     set average-transfer-cost (total-transfer-cost / total-hospitals)
   ]
+end
+
+to update-global-end-variables
+  let tot-occupancy 0
+  let tot-surgeons 0
+  let tot-surgery-day-surgeon 0
+  let max-day 0
+  ask surgeons [
+    set max-day (max (list max-day (length surgeon-schedule)))
+  ]
+  ask surgeons [
+    set tot-surgeons (tot-surgeons + 1)
+    set tot-occupancy (tot-occupancy + occupied-time + operating-hours * 60 * (max-day - (length surgeon-schedule)))
+    let avg-surg-day 0
+    let i 0
+    while [i < (length surgeon-schedule)]
+    [
+      set avg-surg-day (avg-surg-day + (length (item i surgeon-schedule)))
+      set i (i + 1)
+    ]
+    ifese i != 0
+    [set avg-surg-day (avg-surg-day / i)]
+    set tot-surgery-day-surgeon (tot-surgery-day-surgeon + avg-surg-day)
+  ]
+  set avg-surgeon-occupancy-rate (tot-occupancy / (tot-surgeons * operating-hours * 60 * max-day))
+  set avg-surgery-day-surgeon (tot-surgery-day-surgeon / tot-surgeons)
+  ;;or-occupancy-rate
+  ;;avg-surgery-day-or
 end
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; SURGERY FUNCTIONS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1117,10 +1155,10 @@ average-prep-time
 11
 
 MONITOR
-1066
-276
-1158
-321
+1047
+277
+1172
+322
 Max prep time
 max-prep-time
 2
@@ -1186,7 +1224,7 @@ CHOOSER
 hospital-transfer
 hospital-transfer
 "none" "waiting time" "surgeon occupancy" "number surgeries"
-2
+0
 
 MONITOR
 151
@@ -1239,10 +1277,10 @@ NIL
 1
 
 MONITOR
-1206
-274
-1305
-319
+1185
+277
+1319
+322
 Number Transfers
 number-transfer
 2
@@ -1265,7 +1303,7 @@ TEXTBOX
 304
 182
 329
-DATA:
+Data:
 15
 0.0
 1
@@ -1289,6 +1327,28 @@ System Setup:\n
 15
 0.0
 1
+
+MONITOR
+909
+357
+1035
+402
+Avg surgery p/ surgeon
+avg-surgery-day-surgeon
+2
+1
+11
+
+MONITOR
+1050
+357
+1187
+402
+Surgeon occupancy rate
+avg-surgeon-occupancy-rate
+2
+1
+11
 
 @#$#@#$#@
 ## WHAT IS IT?
