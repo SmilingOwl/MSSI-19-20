@@ -101,6 +101,7 @@ to go
       allocate-operating-block
     ]
   ]
+
   save-schedule
 end
 
@@ -235,15 +236,17 @@ to allocate-operating-block
     set final-hosp-id (item 0 result-hosp)
     set transfer-cost (item 1 result-hosp)
   ]
-
+;HERE
   ;; get surgeon who would perform the surgery in each hospital
-  set surgeon-per-hospital (get-surgeon-per-hospital surgery-specialty) ;[hospital-id surgeon-id surgeon-expertise]
+  let head-surgeon (get-surgeon final-hosp-id surgery-specialty)
+  let head-surgeon-duration (calculate-duration surgery-type (item 2 head-surgeon))
+  ;;set surgeon-per-hospital (get-surgeon-per-hospital surgery-specialty) ;[hospital-id surgeon-id surgeon-expertise]
 
   ;; obtain duration of the surgery with each surgeon
-  foreach surgeon-per-hospital
-  [
-    a-surgeon -> set duration (insert-item (length duration) duration (list (item 0 a-surgeon)  (calculate-duration surgery-type (item 2 a-surgeon))))
-  ]
+  ;foreach surgeon-per-hospital
+  ;[
+  ;  a-surgeon -> set duration (insert-item (length duration) duration (list (item 0 a-surgeon)  (calculate-duration surgery-type (item 2 a-surgeon))))
+  ;]
 
   ;; get operating rooms schedule
   let ors-list patches with [or-hosp-id != 0] ;; obtain all operating rooms
@@ -263,22 +266,20 @@ to allocate-operating-block
   [
     op-room ->
     let best-or-schedule (calculate-schedule
-      (item 0 op-room) (item 1 op-room) (get-duration-hospital duration (item 1 op-room)) surgery-type surgery-specialty final-hosp-id (get-surgeon-hospital surgeon-per-hospital (item 1 op-room)))
+      (item 0 op-room) (item 1 op-room) head-surgeon-duration surgery-type surgery-specialty final-hosp-id (item 1 head-surgeon))
     ;; best-or-schedule -> [pxcor pycor day time-block prep-time]
     set best-or-schedule (list (item 2 op-room) (item 3 op-room) (item 0 best-or-schedule) (item 1 best-or-schedule) (item 2 best-or-schedule))
     set available-schedules (lput best-or-schedule available-schedules)
   ]
   let best-schedule (get-best-schedule-surgery available-schedules)
-  let assigned-or-hosp-id 0
   let s-dur duration
   let s-id surgery-id
   ask patches with [pxcor = (item 0 best-schedule) and pycor = (item 1 best-schedule)]
   [
-    set assigned-or-hosp-id or-hosp-id
     insert-surgery (item 2 best-schedule) (item 0 (item 3 best-schedule)) (get-duration-hospital s-dur or-hosp-id) (item 4 best-schedule) s-id
   ]
-  set actual-duration (get-duration-hospital duration assigned-or-hosp-id)
-  set assigned-surgeon (get-surgeon-hospital surgeon-per-hospital assigned-or-hosp-id)
+  set actual-duration head-surgeon-duration
+  set assigned-surgeon (item 1 head-surgeon)
   set assigned-or-coords (list (item 0 best-schedule) (item 1 best-schedule))
   set prep-time (item 4 best-schedule)
   set start-time (item 0 (item 3 best-schedule))
@@ -454,7 +455,6 @@ end
 ;; operating rooms procedure to calculate and return the best schedule for surgery. return [day start-time prep-time]
 to-report calculate-schedule [operating-room-schedule or-hospital-id s-duration s-type s-specialty s-hosp-id s-surgeon]
   let surgeon-last-day 0
-
   ask surgeons with [surgeon-id = s-surgeon]
   [
     set surgeon-last-day get-last-day
@@ -480,7 +480,7 @@ to-report calculate-schedule [operating-room-schedule or-hospital-id s-duration 
   [
     set surg-schedule surgeon-schedule
   ]
-  set available-schedules (check-surgeon-availability surg-schedule available-schedules s-duration)
+  set available-schedules (check-surgeon-availability surg-schedule available-schedules s-duration s-surgeon)
   report (compute-best-schedule available-schedules)
 end
 
@@ -666,7 +666,7 @@ to-report get-last-day
 end
 
 ;; check available schedules for surgeon
-to-report check-surgeon-availability [surg-schedule available-schedules surgery-duration] ;; available-schedules -> list of [day prep-time [[start-time end-time] ...]]
+to-report check-surgeon-availability [surg-schedule available-schedules surgery-duration surg-id] ;; available-schedules -> list of [day prep-time [[start-time end-time] ...]]
   let index 0
   set surg-schedule (obtain-schedule surg-schedule)
   while [index < (length available-schedules)]
@@ -699,7 +699,7 @@ to-report check-surgeon-availability [surg-schedule available-schedules surgery-
               [ set day-available-schedule (insert-item index-to-add day-available-schedule (list (item 1 sds) (item 1 das))) ]
 
               set day-available-schedule (remove-item index-day-or day-available-schedule)
-              ifelse (length day-available-schedule) < index-day-or
+              ifelse (length day-available-schedule) > index-day-or
               [ set das (item index-day-or day-available-schedule) ]
               [ set das [] ]
             ]
@@ -758,10 +758,12 @@ to-report obtain-schedule [s-schedule]
       [
         let s-start-time (start-time + prep-time)
         let s-end-time (s-start-time + actual-duration)
+
         set day-schedule (lput (list s-start-time s-end-time) day-schedule)
       ]
       set index-j (index-j + 1)
     ]
+    set day-schedule (sort-by [[a b] -> (item 0 a) < (item 0 b)] day-schedule)
     set time-block-schedule (lput day-schedule time-block-schedule)
     set index (index + 1)
   ]
@@ -799,6 +801,15 @@ to create-surgeries-data
       set final-hosp-id 0
       let random-x 0
       let random-y 0
+      let patch-y 0
+      let tot-ors 0
+      let hospit-id hosp-id
+      ask patches with [or-hosp-id = hospit-id]
+      [
+        set tot-ors (tot-ors + 1)
+        set patch-y (patch-y + pycor)
+      ]
+      set patch-y (patch-y / tot-ors)
       ifelse random 1 = 1
       [set random-x (random-float 1)]
       [set random-x (random-float -1)]
@@ -806,7 +817,7 @@ to create-surgeries-data
       [set random-y (random-float 1)]
       [set random-y (random-float -1)]
       set xcor -13 + random-x
-      set ycor (16 - hosp-id * 4 + random-y)
+      set ycor ( + random-y)
       ifelse urgency = 1
       [set color green]
       [
@@ -832,7 +843,7 @@ to create-hospitals-data
       set color black
       setxy 15 15
       set hospital-id item 0 data
-      set hospital-color (hospital-id * 10 + 5)
+      set hospital-color (hospital-id * 10 + 16)
       set hospital-type item 1 data
       set or-number item 2 data
       set number-ors or-number
@@ -872,15 +883,24 @@ to create-surgeons-data
       set occupied-time 0
       let random-x 0
       let random-y 0
+      let patch-y 0
+      let tot-ors 0
+      let hospit-id surgeon-hosp-id
+      ask patches with [or-hosp-id = hospit-id]
+      [
+        set tot-ors (tot-ors + 1)
+        set patch-y (patch-y + pycor)
+      ]
+      set patch-y (patch-y / tot-ors)
       ifelse random 1 = 1
       [set random-x (random-float 1)]
       [set random-x (random-float -1)]
       ifelse random 1 = 1
       [set random-y (random-float 1)]
       [set random-y (random-float -1)]
-      set surgeon-init-pos (list (13 + random-x) (16 - surgeon-hosp-id * 4 + random-y))
       set xcor 13 + random-x
-      set ycor (16 - surgeon-hosp-id * 4 + random-y)
+      set ycor (patch-y + random-y)
+      set surgeon-init-pos (list xcor ycor)
       let expertise item 3 data
       ifelse expertise = 1
       [
@@ -1144,7 +1164,7 @@ CHOOSER
 hospital-transfer
 hospital-transfer
 "none" "waiting time" "surgeon occupancy" "number surgeries"
-1
+0
 
 MONITOR
 151

@@ -1,14 +1,14 @@
-"---------- Surgery ",125,-----------
+"---------- Surgery ",193,-----------
 "urgency: ",3
-"surgery-type: ",small
+"surgery-type: ",medium
 "surgery-specialty: ",vascular
 "assigned-surgeon: ",8
 final-hosp-id:,3
 "assigned-day: ",0
 "start-time: ",0
-"end-time: ",90
-"prep-time: ",30
-"actual-duration: ",60
+"end-time: ",160
+"prep-time: ",40
+"actual-duration: ",120
 ""
 "---------- Surgery ",195,-----------
 "urgency: ",3
@@ -17,46 +17,10 @@ final-hosp-id:,3
 "assigned-surgeon: ",8
 final-hosp-id:,3
 "assigned-day: ",0
-"start-time: ",90
-"end-time: ",170
+"start-time: ",160
+"end-time: ",240
 "prep-time: ",20
 "actual-duration: ",60
-""
-"---------- Surgery ",55,-----------
-"urgency: ",3
-"surgery-type: ",small
-"surgery-specialty: ",pediatric
-"assigned-surgeon: ",7
-final-hosp-id:,3
-"assigned-day: ",0
-"start-time: ",170
-"end-time: ",260
-"prep-time: ",30
-"actual-duration: ",60
-""
-"---------- Surgery ",193,-----------
-"urgency: ",3
-"surgery-type: ",medium
-"surgery-specialty: ",vascular
-"assigned-surgeon: ",8
-final-hosp-id:,3
-"assigned-day: ",0
-"start-time: ",260
-"end-time: ",400
-"prep-time: ",20
-"actual-duration: ",120
-""
-"---------- Surgery ",123,-----------
-"urgency: ",3
-"surgery-type: ",medium
-"surgery-specialty: ",pediatric
-"assigned-surgeon: ",7
-final-hosp-id:,3
-"assigned-day: ",0
-"start-time: ",400
-"end-time: ",540
-"prep-time: ",20
-"actual-duration: ",120
 ""
 "---------- Surgery ",171,-----------
 "urgency: ",3
@@ -64,10 +28,22 @@ final-hosp-id:,3
 "surgery-specialty: ",vascular
 "assigned-surgeon: ",8
 final-hosp-id:,3
-"assigned-day: ",1
-"start-time: ",0
-"end-time: ",90
-"prep-time: ",30
+"assigned-day: ",0
+"start-time: ",240
+"end-time: ",320
+"prep-time: ",20
+"actual-duration: ",60
+""
+"---------- Surgery ",125,-----------
+"urgency: ",3
+"surgery-type: ",small
+"surgery-specialty: ",vascular
+"assigned-surgeon: ",8
+final-hosp-id:,3
+"assigned-day: ",0
+"start-time: ",320
+"end-time: ",400
+"prep-time: ",20
 "actual-duration: ",60
 ""
 "---------- Surgery ",56,-----------
@@ -76,35 +52,35 @@ final-hosp-id:,3
 "surgery-specialty: ",vascular
 "assigned-surgeon: ",8
 final-hosp-id:,3
-"assigned-day: ",1
-"start-time: ",90
-"end-time: ",170
+"assigned-day: ",0
+"start-time: ",400
+"end-time: ",480
 "prep-time: ",20
 "actual-duration: ",60
 ""
-"---------- Surgery ",122,-----------
-"urgency: ",2
+"---------- Surgery ",123,-----------
+"urgency: ",3
 "surgery-type: ",medium
 "surgery-specialty: ",pediatric
 "assigned-surgeon: ",7
 final-hosp-id:,3
 "assigned-day: ",1
-"start-time: ",170
-"end-time: ",330
+"start-time: ",0
+"end-time: ",160
 "prep-time: ",40
 "actual-duration: ",120
 ""
-"---------- Surgery ",2,-----------
-"urgency: ",2
-"surgery-type: ",medium
+"---------- Surgery ",55,-----------
+"urgency: ",3
+"surgery-type: ",small
 "surgery-specialty: ",pediatric
 "assigned-surgeon: ",7
 final-hosp-id:,3
 "assigned-day: ",1
-"start-time: ",330
-"end-time: ",470
+"start-time: ",160
+"end-time: ",240
 "prep-time: ",20
-"actual-duration: ",120
+"actual-duration: ",60
 ""
 "---------- Surgery ",52,-----------
 "urgency: ",2
@@ -112,9 +88,9 @@ final-hosp-id:,3
 "surgery-specialty: ",vascular
 "assigned-surgeon: ",8
 final-hosp-id:,3
-"assigned-day: ",2
-"start-time: ",0
-"end-time: ",160
+"assigned-day: ",1
+"start-time: ",240
+"end-time: ",400
 "prep-time: ",40
 "actual-duration: ",120
 ""
@@ -124,22 +100,46 @@ final-hosp-id:,3
 "surgery-specialty: ",pediatric
 "assigned-surgeon: ",7
 final-hosp-id:,3
-"assigned-day: ",2
-"start-time: ",160
-"end-time: ",250
-"prep-time: ",30
+"assigned-day: ",1
+"start-time: ",400
+"end-time: ",480
+"prep-time: ",20
 "actual-duration: ",60
 ""
-"---------- Surgery ",194,-----------
+"---------- Surgery ",2,-----------
+"urgency: ",2
+"surgery-type: ",medium
+"surgery-specialty: ",pediatric
+"assigned-surgeon: ",7
+final-hosp-id:,3
+"assigned-day: ",2
+"start-time: ",0
+"end-time: ",160
+"prep-time: ",40
+"actual-duration: ",120
+""
+"---------- Surgery ",122,-----------
+"urgency: ",2
+"surgery-type: ",medium
+"surgery-specialty: ",pediatric
+"assigned-surgeon: ",7
+final-hosp-id:,3
+"assigned-day: ",2
+"start-time: ",160
+"end-time: ",300
+"prep-time: ",20
+"actual-duration: ",120
+""
+"---------- Surgery ",65,-----------
 "urgency: ",1
 "surgery-type: ",small
 "surgery-specialty: ",vascular
 "assigned-surgeon: ",8
 final-hosp-id:,3
 "assigned-day: ",2
-"start-time: ",250
-"end-time: ",330
-"prep-time: ",20
+"start-time: ",300
+"end-time: ",390
+"prep-time: ",30
 "actual-duration: ",60
 ""
 "---------- Surgery ",169,-----------
@@ -149,9 +149,21 @@ final-hosp-id:,3
 "assigned-surgeon: ",7
 final-hosp-id:,3
 "assigned-day: ",2
-"start-time: ",330
-"end-time: ",410
+"start-time: ",390
+"end-time: ",470
 "prep-time: ",20
+"actual-duration: ",60
+""
+"---------- Surgery ",239,-----------
+"urgency: ",1
+"surgery-type: ",small
+"surgery-specialty: ",pediatric
+"assigned-surgeon: ",7
+final-hosp-id:,3
+"assigned-day: ",3
+"start-time: ",0
+"end-time: ",90
+"prep-time: ",30
 "actual-duration: ",60
 ""
 "---------- Surgery ",54,-----------
@@ -160,9 +172,9 @@ final-hosp-id:,3
 "surgery-specialty: ",pediatric
 "assigned-surgeon: ",7
 final-hosp-id:,3
-"assigned-day: ",2
-"start-time: ",410
-"end-time: ",490
+"assigned-day: ",3
+"start-time: ",90
+"end-time: ",170
 "prep-time: ",20
 "actual-duration: ",60
 ""
@@ -173,32 +185,20 @@ final-hosp-id:,3
 "assigned-surgeon: ",7
 final-hosp-id:,3
 "assigned-day: ",3
-"start-time: ",0
-"end-time: ",90
-"prep-time: ",30
-"actual-duration: ",60
-""
-"---------- Surgery ",239,-----------
-"urgency: ",1
-"surgery-type: ",small
-"surgery-specialty: ",pediatric
-"assigned-surgeon: ",7
-final-hosp-id:,3
-"assigned-day: ",3
-"start-time: ",90
-"end-time: ",170
+"start-time: ",170
+"end-time: ",250
 "prep-time: ",20
 "actual-duration: ",60
 ""
-"---------- Surgery ",65,-----------
+"---------- Surgery ",194,-----------
 "urgency: ",1
 "surgery-type: ",small
 "surgery-specialty: ",vascular
 "assigned-surgeon: ",8
 final-hosp-id:,3
 "assigned-day: ",3
-"start-time: ",170
-"end-time: ",260
+"start-time: ",250
+"end-time: ",340
 "prep-time: ",30
 "actual-duration: ",60
 ""
