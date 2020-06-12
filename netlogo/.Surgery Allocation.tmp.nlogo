@@ -864,7 +864,7 @@ to create-surgeons-data
     create-surgeons 1 [
       set size 1.5
       set color 5
-      set shape "person doctor"
+      set shape " person"
       set surgeon-id item 0 data
       set surgeon-specialty item 1 data
       set surgeon-hosp-id item 2 data
@@ -1025,7 +1025,7 @@ INPUTBOX
 193
 188
 data-folder
-data/overflow
+data/two_hospitals
 1
 0
 String
