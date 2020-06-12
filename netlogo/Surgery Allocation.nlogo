@@ -240,7 +240,7 @@ end
 to allocate-operating-block
   let transfer-cost 0
   ;; check if surgery should be transferred
-  ifelse hospital-transfer = "none"
+  ifelse Hospital-transfer = "none"
   [ set final-hosp-id hosp-id ]
   [
     let result-hosp (get-hospital-for-surgery hosp-id surgery-specialty)
@@ -256,7 +256,7 @@ to allocate-operating-block
   let ors-list patches with [or-hosp-id != 0] ;; obtain all operating rooms
   let available-schedules []
   let s-hosp-id final-hosp-id
-  if heuristic = "minimize-prep-time" or heuristic = "minimize-waiting-time"
+  if Heuristic = "minimize-prep-time" or Heuristic = "minimize-waiting-time"
   [
     set ors-list patches with [or-hosp-id = s-hosp-id] ;; obtain operating rooms of surgery's hospital
   ]
@@ -378,19 +378,19 @@ to-report get-hospital-for-surgery [original-hospital specialty]
     let metric 0
     let surgeries-done 0
     let surgeries-todo 0
-    if hospital-transfer = "surgeon occupancy"
+    if Hospital-transfer = "surgeon occupancy"
     [
       set metric (get-total-occupied-time specialty)
       set surgeries-done  get-total-surgeries-done
       set surgeries-todo  get-total-surgeries
     ]
-    if hospital-transfer = "waiting time"
+    if Hospital-transfer = "waiting time"
     [
       set metric (max (list get-min-last-day-or get-min-last-day-surgeon specialty))
       set surgeries-done  get-total-surgeries-done
       set surgeries-todo  get-total-surgeries
     ]
-    if hospital-transfer = "number surgeries"
+    if Hospital-transfer = "number surgeries"
     [
       set metric get-total-surgeries
       set surgeries-done  get-total-surgeries-done
@@ -408,7 +408,7 @@ to-report get-hospital-for-surgery [original-hospital specialty]
   ]
   let avg-metric (total-metric / (length hosp-info))
   let transfer? false
-  ifelse hospital-transfer = "number surgeries"
+  ifelse Hospital-transfer = "number surgeries"
   [
     let best-hospital original-hosp-info
     set i 0
@@ -470,12 +470,12 @@ to-report get-best-schedule-surgery [available-schedules]
   let index 0
   while [index < (length available-schedules)]
   [
-    ifelse heuristic = "minimize-prep-time" and (item 4 (item index available-schedules)) < (item 4 best-schedule)
+    ifelse Heuristic = "minimize-prep-time" and (item 4 (item index available-schedules)) < (item 4 best-schedule)
     [
       set best-schedule (item index available-schedules)
     ]
     [
-      if heuristic = "minimize-waiting-time" and (item 2 (item index available-schedules)) < (item 2 best-schedule)
+      if Heuristic = "minimize-waiting-time" and (item 2 (item index available-schedules)) < (item 2 best-schedule)
       [
         set best-schedule (item index available-schedules)
       ]
@@ -561,13 +561,13 @@ to-report compute-best-schedule [available-schedules]
   let index 0
   while [index < (length available-schedules)]
   [
-    ifelse heuristic = "minimize-prep-time"
+    ifelse Heuristic = "minimize-prep-time"
     [
       if (item 1 (item index available-schedules)) < (item 2 best-schedule)
       [ set best-schedule (list (item 0 (item index available-schedules)) (item 0 (item 2 (item index available-schedules))) (item 1 (item index available-schedules)))]
     ]
     [
-      if heuristic = "minimize-waiting-time"
+      if Heuristic = "minimize-waiting-time"
       [
         if (item 0 (item 0 (item 2 (item 0 available-schedules)))) < (item 0 (item 1 best-schedule))
         [ set best-schedule (list (item 0 (item index available-schedules)) (item 0 (item 2 (item index available-schedules))) (item 1 (item index available-schedules)))]
@@ -631,8 +631,14 @@ to-report get-surgeon [s-hosp-id specialty]
   let all-surgeons []
   ask surgeons with [surgeon-hosp-id = s-hosp-id and surgeon-specialty = specialty]
   [
-    set all-surgeons insert-item (length all-surgeons) all-surgeons get-occupied-time
+  if Surgeon-heuristic = "occupancy" [
+      set all-surgeons insert-item (length all-surgeons) all-surgeons get-occupied-time
+    ]
+  if Surgeon-heuristic = "occupancy-&-expertise" [
+      set all-surgeons insert-item (length all-surgeons) all-surgeons get-most-free-and-expert
+    ]
   ]
+
   let min-value (item 2 (item 0 all-surgeons))
   let best-surgeon (item 0 (item 0 all-surgeons))
   let expertise (item 3 (item 0 all-surgeons))
@@ -711,6 +717,26 @@ end
 ;; obtain a surgeons occupied time. returns [surgeon-id hospital-id occupied-time expertise]
 to-report get-occupied-time
   report (list surgeon-id surgeon-hosp-id occupied-time surgeon-expertise)
+end
+
+to-report get-most-free-and-expert
+  let expertise-value 0
+  ifelse surgeon-expertise = "new"
+  [
+    set expertise-value 1
+  ]
+  [
+    ifelse surgeon-expertise = "veteran"
+    [
+      set expertise-value 2
+    ]
+    [
+      set expertise-value 3
+    ]
+  ]
+
+  let value-to-min (occupied-time + 0.25 * occupied-time * (3 - expertise-value))
+  report (list surgeon-id surgeon-hosp-id value-to-min surgeon-expertise)
 end
 
 to-report get-last-day
@@ -1049,9 +1075,9 @@ ticks
 
 BUTTON
 129
-212
+253
 299
-245
+286
 Allocate Operating Blocks
 go
 NIL
@@ -1065,20 +1091,20 @@ NIL
 1
 
 CHOOSER
-28
-41
-207
-86
-heuristic
-heuristic
+19
+94
+198
+139
+Heuristic
+Heuristic
 "minimize-prep-time" "minimize-waiting-time"
-1
+0
 
 BUTTON
 130
-172
+213
 299
-205
+246
 Setup Experiment
 setup
 NIL
@@ -1092,10 +1118,10 @@ NIL
 1
 
 INPUTBOX
-28
-95
-206
-155
+221
+41
+399
+101
 data-folder
 data/overflow
 1
@@ -1103,10 +1129,10 @@ data/overflow
 String
 
 SLIDER
-218
-107
-397
-140
+221
+111
+400
+144
 operating-hours
 operating-hours
 8
@@ -1180,10 +1206,10 @@ average-waiting-time
 11
 
 MONITOR
-29
-337
-124
-382
+23
+364
+118
+409
 Total surgeries
 total-surgeries
 17
@@ -1209,20 +1235,20 @@ PENS
 "default" 1.0 0 -13840069 true "" "plot average-prep-time"
 
 CHOOSER
-217
-41
-397
-86
-hospital-transfer
-hospital-transfer
+19
+148
+199
+193
+Hospital-transfer
+Hospital-transfer
 "none" "waiting time" "surgeon occupancy" "number surgeries"
-0
+2
 
 MONITOR
-151
-400
-246
-445
+145
+427
+240
+472
 Total surgeons
 total-surgeons
 17
@@ -1230,10 +1256,10 @@ total-surgeons
 11
 
 MONITOR
-30
-400
-123
-445
+24
+427
+117
+472
 Total hospitals
 total-hospitals
 17
@@ -1241,10 +1267,10 @@ total-hospitals
 11
 
 MONITOR
-149
-337
-245
-382
+143
+364
+239
+409
 Number of ORs
 total-or
 17
@@ -1253,9 +1279,9 @@ total-or
 
 BUTTON
 129
-252
+293
 300
-285
+326
 Show Allocation Results
 show-results
 NIL
@@ -1291,10 +1317,10 @@ average-transfer-cost
 11
 
 TEXTBOX
-32
-304
-182
-329
+26
+331
+176
+356
 Data:
 15
 0.0
@@ -1311,10 +1337,10 @@ Results:
 1
 
 TEXTBOX
-30
-14
-180
-33
+21
+13
+171
+32
 System Setup:\n
 15
 0.0
@@ -1363,6 +1389,16 @@ or-occupancy-rate
 2
 1
 11
+
+CHOOSER
+18
+41
+207
+86
+Surgeon-heuristic
+Surgeon-heuristic
+"occupancy" "occupancy-&-expertise"
+1
 
 @#$#@#$#@
 ## WHAT IS IT?
